@@ -32,9 +32,9 @@ export default class IpcService {
         });
     }
 
-    analyze(soundfiles: string[]) {
+    analyze(folder: string) {
         // TODO: use this.getstream to receive all streamed results
-        return this.send<Record<string, any>>('analyze', { params: soundfiles });
+        return this.send<Record<string, any>>('analyze', { params: [folder] });
     }
 
     getSounds(query: Record<string, any>) {

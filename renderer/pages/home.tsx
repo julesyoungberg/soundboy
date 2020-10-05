@@ -13,7 +13,7 @@ export default function Home() {
     const analyze = async () => {
         if (!ipcService) return;
         console.log('analyze');
-        const res = await ipcService.analyze(['./soundfile.wav']);
+        const res = await ipcService.analyze('./sounds');
         console.log(res);
     };
 

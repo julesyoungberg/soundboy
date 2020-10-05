@@ -14,8 +14,8 @@ export default class AnalyzerChannel extends Channel {
         console.log('AnalyzerChannel request: ', request.params);
         const responseChannel = this.getResponseChannel(request);
 
-        const filenames = request.params;
-        if (!filenames || filenames.length === 0) {
+        const folder = request.params?.[0]
+        if (!folder) {
             // TODO: error message
             return;
         }
@@ -24,6 +24,6 @@ export default class AnalyzerChannel extends Channel {
             event.sender.send(responseChannel, data);
         };
 
-        analyzeSounds(filenames, sendUpdate);
+        await analyzeSounds(folder, sendUpdate);
     }
 }

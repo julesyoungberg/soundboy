@@ -1,40 +1,43 @@
-import { Worker } from 'worker_threads';
+import { spawn, Pool, Worker } from 'threads';
 
 import db from '../db';
 import getAppPath from '../../util/getAppPath';
 
 /**
+ * Recursively finds all the sound files (mp3, wav, aif) in the given folder
+ * @param folder 
+ * @returns an array of sound file names
+ */
+function getSoundFiles(folder: string): string[] {
+    return [folder];
+}
+
+/**
  * This function spawns a worker thread to analyze the given sound files
- * @param filenames
+ * @param folder
  * @param callback called after each analysis
  */
-export function analyzeSounds(filenames: string[], callback: (data: Record<string, any>) => void) {
+export async function analyzeSounds(folder: string, callback: (data: Record<string, any>) => void) {
     console.log('spawning analyzer worker');
-    const worker = new Worker(`${getAppPath()}/main/analyzer/worker.js`, {
-        workerData: {
-            path: '../main/analyzer/worker.ts',
-            filenames,
-        },
+
+    const pool = Pool(() => spawn(new Worker(`${getAppPath()}/main/analyzer/worker`)), 8);
+
+    getSoundFiles(folder).forEach((filename) => {
+        pool.queue(async (analyzer) => {
+            let result: Record<string, any> = {};
+
+            try {
+                result = await analyzer.analyze(filename);
+                await db.sounds.insert(result);
+            } catch (error) {
+                console.error(error);
+                result = { error };
+            }
+
+            callback({ result });
+        });
     });
 
-    const handlers = {
-        online: () => {
-            console.log('analyzer worker online');
-            worker.postMessage(filenames);
-        },
-        message: async (data: Record<string, any>) => {
-            console.log('analyzer worker message handler: ', data);
-            await db.sounds.insert(data);
-            callback(data);
-        },
-        error: (error: string) => {
-            console.log('analyzer worker error handler: ', error);
-            callback({ error });
-        },
-        exit: (code: string) => {
-            console.log('analyzer worker exited with status code: ', code);
-        },
-    };
-
-    Object.entries(handlers).forEach(([event, handler]) => worker.on(event, handler));
+    await pool.settled();
+    callback({ done: true });
 }
