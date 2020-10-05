@@ -10,19 +10,19 @@ export default class AnalyzerChannel extends Channel {
      * @param event
      * @param request { responseChannel, params: a list of sound file names }
      */
-    async handler(event: IpcMainEvent, request: IPC.Request) {
+    async handler(event: IpcMainEvent, request: IPCRequest) {
         console.log('AnalyzerChannel request: ', request.params);
         const responseChannel = this.getResponseChannel(request);
 
-        const folder = request.params?.[0]
+        const sendUpdate = (data: AnalyzerMessage) => {
+            event.sender.send(responseChannel, [JSON.stringify(data)]);
+        };
+
+        const folder = request.params?.[0];
         if (!folder) {
-            // TODO: error message
+            sendUpdate({ done: true, error: 'No folder specified' });
             return;
         }
-
-        const sendUpdate = (data: Record<string, any>) => {
-            event.sender.send(responseChannel, data);
-        };
 
         await analyzeSounds(folder, sendUpdate);
     }

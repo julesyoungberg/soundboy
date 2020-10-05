@@ -8,15 +8,17 @@ class Sounds {
         this.db = dbFactory('sounds.db');
     }
 
-    insert(data: Record<string, any>) {
+    async insert(data: Record<string, any>) {
         console.log('sounds db insert: ', data);
-        return this.db.insert(data);
+        const result = await this.db.insert(data);
+        return result;
     }
 
-    fetch(query: Record<string, any>) {
+    async fetch(query: Record<string, any>): Promise<Sound[]> {
         // TODO: use the query
         console.log('sounds db fetch: ', query);
-        return this.db.find(query);
+        const result = await this.db.find(query);
+        return result as any;
     }
 }
 

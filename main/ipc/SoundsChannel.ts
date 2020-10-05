@@ -9,7 +9,7 @@ export default class SoundsChannel extends Channel {
      * @param event
      * @param request { responseChannel, params: [DB query object] }
      */
-    async handler(event: IpcMainEvent, request: IPC.Request) {
+    async handler(event: IpcMainEvent, request: IPCRequest) {
         console.log('SoundsChannel request: ', request.params);
         const responseChannel = this.getResponseChannel(request);
         const query = request.params?.[0];
@@ -18,7 +18,15 @@ export default class SoundsChannel extends Channel {
             return;
         }
 
-        const sounds = await db.sounds.fetch(JSON.parse(query));
-        event.sender.send(responseChannel, sounds);
+        let reply: SoundsMessage = {};
+
+        try {
+            const results = await db.sounds.fetch(JSON.parse(query));
+            reply = { results };
+        } catch (error) {
+            reply = { error };
+        }
+
+        event.sender.send(responseChannel, JSON.stringify(reply));
     }
 }

@@ -2,14 +2,15 @@ import { spawn, Pool, Worker } from 'threads';
 
 import db from '../db';
 import getAppPath from '../../util/getAppPath';
+import glob from 'glob-promise';
 
 /**
  * Recursively finds all the sound files (mp3, wav, aif) in the given folder
- * @param folder 
+ * @param folder
  * @returns an array of sound file names
  */
-function getSoundFiles(folder: string): string[] {
-    return [folder];
+function getSoundFiles(folder: string) {
+    return glob.promise(`${folder}/**/*.{mp3,wav,aif,flac}`);
 }
 
 /**
@@ -17,24 +18,20 @@ function getSoundFiles(folder: string): string[] {
  * @param folder
  * @param callback called after each analysis
  */
-export async function analyzeSounds(folder: string, callback: (data: Record<string, any>) => void) {
+export async function analyzeSounds(folder: string, callback: (data: AnalyzerMessage) => void) {
     console.log('spawning analyzer worker');
 
     const pool = Pool(() => spawn(new Worker(`${getAppPath()}/main/analyzer/worker`)), 8);
 
-    getSoundFiles(folder).forEach((filename) => {
+    (await getSoundFiles(folder)).forEach((filename) => {
         pool.queue(async (analyzer) => {
-            let result: Record<string, any> = {};
-
             try {
-                result = await analyzer.analyze(filename);
+                const result = await analyzer.analyze(filename);
                 await db.sounds.insert(result);
+                callback({ result });
             } catch (error) {
-                console.error(error);
-                result = { error };
+                callback({ error, result: { filename } });
             }
-
-            callback({ result });
         });
     });
 

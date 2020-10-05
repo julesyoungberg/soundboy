@@ -17,8 +17,10 @@
   "dependencies": {
     "@emotion/babel-preset-css-prop": "^10.0.27",
     "@tensorflow/tfjs-node": "^2.4.0",
+    "audio-loader": "^1.0.3",
     "electron-serve": "^1.0.0",
     "electron-store": "^6.0.0",
+    "glob-promise": "^3.4.0",
     "meyda": "^5.0.7",
     "nedb-promises": "^4.0.4",
     "threads": "^1.6.3"
@@ -28,6 +30,7 @@
     "@emotion/core": "^10.0.35",
     "@emotion/styled": "^10.0.27",
     "@rebass/preset": "^4.0.5",
+    "@types/meyda": "^4.3.1",
     "@types/node": "^14.6.4",
     "@types/react": "^16.9.49",
     "@types/react-dom": "^16.9.8",

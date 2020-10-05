@@ -12,7 +12,7 @@ export default class IpcService {
         this.ipcRenderer = window.require('electron').ipcRenderer;
     }
 
-    send<T>(channel: string, request: IPC.Request = {}): Promise<T> {
+    send<T>(channel: string, request: IPCRequest = {}): Promise<T> {
         console.log('sending to', channel);
         // If the ipcRenderer is not available try to initialize it
         if (!this.ipcRenderer) {
@@ -34,11 +34,11 @@ export default class IpcService {
 
     analyze(folder: string) {
         // TODO: use this.getstream to receive all streamed results
-        return this.send<Record<string, any>>('analyze', { params: [folder] });
+        return this.send<AnalyzerMessage>('analyze', { params: [folder] });
     }
 
     getSounds(query: Record<string, any>) {
-        return this.send<Record<string, any>>('sounds', { params: [JSON.stringify(query)] });
+        return this.send<SoundsMessage>('sounds', { params: [JSON.stringify(query)] });
     }
 }
 
