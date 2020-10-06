@@ -19,7 +19,7 @@ const FEATURES = [
     'spectralKurtosis',
 ];
 
-function toMono(buffer: AudioBuffer) {
+export function toMono(buffer: AudioBuffer) {
     if (buffer.numberOfChannels == 1) {
         return buffer.getChannelData(0);
     }
@@ -33,7 +33,7 @@ function toMono(buffer: AudioBuffer) {
     throw new Error('unexpected number of channels');
 }
 
-async function getFeatures(filename: string): Promise<Sound> {
+export async function getFeatures(filename: string): Promise<Sound> {
     const buffer: AudioBuffer = await load(filename);
     const signal = toMono(buffer);
     const features = Meyda.extract(FEATURES as any, signal);
