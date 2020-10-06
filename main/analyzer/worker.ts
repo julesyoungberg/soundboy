@@ -1,7 +1,44 @@
-// import load from 'audio-loader';
-// import Meyda from 'meyda';
+import load from 'audio-loader';
+import Meyda from 'meyda';
 // import * as tf from '@tensorflow/tfjs-node';
 import { expose } from 'threads/worker';
+
+const FEATURES = [
+    'chroma',
+    'loudness',
+    'mfcc',
+    'perceptualSharpness',
+    'perceptualSpread',
+    'spectralCentroid',
+    'spectralFlatness',
+    'spectralFlux',
+    'spectralSlope',
+    'spectralRolloff',
+    'spectralSpread',
+    'spectralSkewness',
+    'spectralKurtosis',
+];
+
+function toMono(buffer: AudioBuffer) {
+    if (buffer.numberOfChannels == 1) {
+        return buffer.getChannelData(0);
+    }
+
+    if (buffer.numberOfChannels == 2) {
+        const left = buffer.getChannelData(0);
+        const right = buffer.getChannelData(0);
+        return left.map((v, i) => (v + right[i]) / 2);
+    }
+
+    throw new Error('unexpected number of channels');
+}
+
+async function getFeatures(filename: string): Promise<Sound> {
+    const buffer: AudioBuffer = await load(filename);
+    const signal = toMono(buffer);
+    const features = Meyda.extract(FEATURES as any, signal);
+    return { ...features, filename };
+}
 
 /**
  * Main worker function for analyzing a sound file
@@ -10,21 +47,8 @@ import { expose } from 'threads/worker';
  */
 async function analyze(filename: string): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
-    const result: Sound = { filename };
-    // const buffer: AudioBuffer = await load(filename);
-    // const opt: Meyda.MeydaAnalyzerOptions = {
-    //     "audioContext": audioContext,
-    //     "source": source,
-    //     "bufferSize": 512,
-    //     "featureExtractors": ["rms"],
-    //     "inputs": 2,
-    //     "numberOfMFCCCoefficients": 20
-    //     "callback": features => {
-    //         levelRangeElement.value = features.rms;
-    //     }
-    // };
-    // const meyda = Meyda.createMeydaAnalyzer(opt);
-    // load, classify, extract perceptual features
+    const result = await getFeatures(filename);
+    // TODO: classify instrument with ML
     return result;
 }
 
