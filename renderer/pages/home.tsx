@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Button, Heading } from 'rebass';
+import { Button, Heading, Text } from 'rebass';
+import SelectFolder from '../components/select-folder';
 
 import useIpcService from '../hooks/useIpcService';
 
 export default function Home() {
     const ipcService = useIpcService();
+    const [folder, setFolder] = useState();
 
     const analyze = async () => {
         if (!ipcService) return;
@@ -37,13 +39,15 @@ export default function Home() {
                         <a>Go to next page</a>
                     </Link>
                 </p>
-                <Button variant='primary' mr={2} onClick={analyze}>
+                <Button disabled={!folder} variant='primary' mr={2} onClick={analyze}>
                     Analyze
                 </Button>
                 <Button variant='primary' mr={2} onClick={getSounds}>
                     Get Sounds
                 </Button>
                 <img src='/images/logo.png' />
+                <SelectFolder onChange={setFolder} />
+                {!!folder && <Text color='primary'>You have selected {folder} as your folder</Text>}
             </div>
         </>
     );
