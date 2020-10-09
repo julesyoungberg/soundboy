@@ -1,6 +1,6 @@
 import { IpcMainEvent } from 'electron';
 
-import { analyzeSounds } from '../analyzer';
+// import { analyzeSounds } from '../analyzer';
 import Channel from './Channel';
 
 export default class AnalyzerChannel extends Channel {
@@ -24,6 +24,6 @@ export default class AnalyzerChannel extends Channel {
             return;
         }
 
-        await analyzeSounds(folder, sendUpdate);
+        // await analyzeSounds(folder, sendUpdate);
     }
 }

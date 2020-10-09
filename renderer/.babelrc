@@ -1,9 +1,10 @@
 {
   "presets": [
-    "next/babel",
-    "@emotion/babel-preset-css-prop"
+    "@emotion/babel-preset-css-prop",
+    "next/babel"
   ],
   "plugins": [
+    "@babel/plugin-proposal-class-properties",
     ["emotion"]
   ]
 }

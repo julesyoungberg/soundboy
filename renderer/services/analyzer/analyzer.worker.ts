@@ -1,7 +1,8 @@
 import load from 'audio-loader';
 import Meyda from 'meyda';
 // import * as tf from '@tensorflow/tfjs-node';
-import { expose } from 'threads/worker';
+
+const ctx: Worker = self as any;
 
 const FEATURES = [
     'chroma',
@@ -19,6 +20,7 @@ const FEATURES = [
     'spectralKurtosis',
 ];
 
+// convert a stereo signal to mono by averaging the two channels
 export function toMono(buffer: AudioBuffer) {
     if (buffer.numberOfChannels == 1) {
         return buffer.getChannelData(0);
@@ -33,6 +35,7 @@ export function toMono(buffer: AudioBuffer) {
     throw new Error('unexpected number of channels');
 }
 
+// extract basic features from a sound file
 export async function getFeatures(filename: string): Promise<Sound> {
     const buffer: AudioBuffer = await load(filename);
     const signal = toMono(buffer);
@@ -52,8 +55,5 @@ async function analyze(filename: string): Promise<Sound> {
     return result;
 }
 
-const analyzer = { analyze };
-
-export type Analyzer = typeof analyzer;
-
-expose(analyzer);
+ctx.addEventListener('analyze', (event) => console.log('worker', event))
+// ctx.postmessage({});

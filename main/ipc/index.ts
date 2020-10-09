@@ -13,7 +13,6 @@ export function registerIpcChannels() {
         console.log(`Registering channel '${channel.name}'`);
         // register the ipc channel to the main process with it's corresponding handler
         ipcMain.on(channel.name, (event, request) => {
-            console.log('IPC message', channel.name, event, request);
             channel.handler(event, request);
         });
     });
