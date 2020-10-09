@@ -1,5 +1,6 @@
 import React from 'react';
 import { IpcRenderer } from 'electron';
+import Stream from 'stream';
 
 export default class IpcService {
     private ipcRenderer?: IpcRenderer;
@@ -10,9 +11,16 @@ export default class IpcService {
             throw new Error(`Unable to require renderer process`);
         }
         this.ipcRenderer = window.require('electron').ipcRenderer;
+        // hacky public exposure of this function for console experimentation
+        (window as any).getSounds = this.getSounds.bind(this);
     }
 
-    send<T>(channel: string, request: IPCRequest = {}): Promise<T> {
+    /**
+     * Generic IPC channel send logic
+     * @param channel 
+     * @param request
+     */
+    send(channel: string, request: IPCRequest = {}) {
         console.log('sending to', channel);
         // If the ipcRenderer is not available try to initialize it
         if (!this.ipcRenderer) {
@@ -23,22 +31,56 @@ export default class IpcService {
             request.responseChannel = `${channel}_response_${new Date().getTime()}`;
         }
 
-        const { ipcRenderer } = this;
-        ipcRenderer.send(channel, request);
+        this.ipcRenderer.send(channel, request);
+    }
 
-        // This method returns a promise which will be resolved when the response has arrived.
+    /**
+     * This method returns a promise which will be resolved when the response has arrived.
+     * @param channel 
+     * @param request 
+     */
+    fetch(channel: string, request: IPCRequest = {}): Promise<IPCResponse> {
+        this.send(channel, request);
         return new Promise((resolve) => {
-            ipcRenderer.once(request.responseChannel, (_event, response) => resolve(response));
+            this.ipcRenderer.once(request.responseChannel, (_event, response) => resolve(JSON.parse(response)));
         });
     }
 
-    analyze(folder: string) {
-        // TODO: use this.getstream to receive all streamed results
-        return this.send<AnalyzerMessage>('analyze', { params: [folder] });
+    /**
+     * generator function that yields all IPC responses to request
+     * @param channel 
+     * @param request 
+     * @param callback 
+     */
+    getStream(channel: string, request: IPCRequest): Stream.Readable {
+        const stream = new Stream.Readable();
+        this.send(channel, request);
+        // listen until a response with done==true is received
+        const responseListener = (_event: any, res: string) => {
+            const response = JSON.parse(res);
+            if (response.done) {
+                this.ipcRenderer.removeListener(request.responseChannel, responseListener);
+            }
+            stream.push(response);
+        };
+
+        this.ipcRenderer.on(request.responseChannel, responseListener);
+        return stream;
     }
 
-    getSounds(query: Record<string, any>) {
-        return this.send<SoundsMessage>('sounds', { params: [JSON.stringify(query)] });
+    async analyze(folder: string) {
+        const stream = this.getStream('analyze', { params: [folder] });
+        const responses: IPCResponse[] = [];
+        for await (const response of stream) {
+            console.log(response);
+            responses.push(response);
+        }
+        return responses;
+    }
+
+    async getSounds(query: Record<string, any>) {
+        const result = await this.fetch('sounds', { params: [JSON.stringify(query)] });
+        return result;
     }
 }
 

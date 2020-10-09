@@ -18,13 +18,13 @@ export default class SoundsChannel extends Channel {
             return;
         }
 
-        let reply: SoundsMessage = {};
+        let reply: IPCResponse = {};
 
         try {
             const results = await db.sounds.fetch(JSON.parse(query));
-            reply = { results };
+            reply = { done: true, results };
         } catch (error) {
-            reply = { error };
+            reply = { done: true, error };
         }
 
         event.sender.send(responseChannel, JSON.stringify(reply));

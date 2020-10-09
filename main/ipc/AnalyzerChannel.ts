@@ -14,7 +14,7 @@ export default class AnalyzerChannel extends Channel {
         console.log('AnalyzerChannel request: ', request.params);
         const responseChannel = this.getResponseChannel(request);
 
-        const sendUpdate = (data: AnalyzerMessage) => {
+        const sendUpdate = (data: IPCResponse) => {
             event.sender.send(responseChannel, [JSON.stringify(data)]);
         };
 

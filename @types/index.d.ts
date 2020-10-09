@@ -26,18 +26,14 @@ interface Sound {
     spectralKurtosis?: number;
 }
 
-interface AnalyzerMessage {
-    done?: boolean;
-    error?: string;
-    result?: Sound;
-}
-
-interface SoundsMessage {
-    error?: string;
-    results?: Sound[];
-}
-
 interface IPCRequest {
     responseChannel?: string;
     params?: string[];
+}
+
+interface IPCResponse {
+    done?: boolean;
+    error?: string;
+    result?: Sound;
+    results?: Sound[];
 }
