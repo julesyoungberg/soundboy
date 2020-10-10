@@ -13,7 +13,7 @@ export default function Home() {
     const analyze = async () => {
         if (!ipcService) return;
         console.log('analyze');
-        const res = await analyzer.analyze(folder || './samples');
+        const res = await analyzer.analyze(folder || './samples'); //ipcService.analyze(folder || './samples');
         console.log(res);
     };
 
@@ -33,7 +33,7 @@ export default function Home() {
                 <Heading fontSize={[6, 7, 8]} color='primary' fontWeight='800'>
                     Soundboy
                 </Heading>
-                <Button disabled={!folder} variant='primary' mr={2} onClick={analyze}>
+                <Button variant='primary' mr={2} onClick={analyze}>
                     Analyze
                 </Button>
                 <Button variant='primary' mr={2} onClick={getSounds}>

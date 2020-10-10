@@ -9,7 +9,17 @@ module.exports = withWorkers({
 
     webpack(config) {
         config.target = 'electron-renderer';
-        config.output.globalObject = `(typeof self !== 'undefined' ? self : this)`;
+        config.output.globalObject = `(() => {
+            if (typeof self !== 'undefined') {
+                return self;
+            } else if (typeof window !== 'undefined') {
+                return window;
+            } else if (typeof global !== 'undefined') {
+                return global;
+            } else {
+                return Function('return this')();
+            }
+        })()`;
         return config;
     },
 });

@@ -69,6 +69,7 @@ export default (windowName: string, options: BrowserWindowConstructorOptions): B
         ...state,
         webPreferences: {
             nodeIntegration: true,
+            nodeIntegrationInWorker: true,
             ...options.webPreferences,
         },
     };

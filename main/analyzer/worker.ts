@@ -1,9 +1,7 @@
-// import * as tf from '@tensorflow/tfjs-node';
-import load from 'audio-loader';
-import Meyda from 'meyda/dist/node';
+// import load from 'audio-loader';
+// import Meyda from 'meyda';
+// // import * as tf from '@tensorflow/tfjs-node';
 import { expose } from 'threads/worker';
-
-const ctx: Worker = self as any;
 
 const FEATURES = [
     'chroma',
@@ -21,7 +19,6 @@ const FEATURES = [
     'spectralKurtosis',
 ];
 
-// convert a stereo signal to mono by averaging the two channels
 export function toMono(buffer: AudioBuffer) {
     if (buffer.numberOfChannels == 1) {
         return buffer.getChannelData(0);
@@ -36,13 +33,12 @@ export function toMono(buffer: AudioBuffer) {
     throw new Error('unexpected number of channels');
 }
 
-// extract basic features from a sound file
-export async function getFeatures(filename: string): Promise<Sound> {
-    const buffer: AudioBuffer = await load(filename);
-    const signal = toMono(buffer);
-    const features = Meyda.extract(FEATURES as any, signal);
-    return { ...features, filename };
-}
+// export async function getFeatures(filename: string): Promise<Sound> {
+//     const buffer: AudioBuffer = await load(filename);
+//     const signal = toMono(buffer);
+//     const features = Meyda.extract(FEATURES as any, signal);
+//     return { ...features, filename };
+// }
 
 /**
  * Main worker function for analyzing a sound file
@@ -51,15 +47,10 @@ export async function getFeatures(filename: string): Promise<Sound> {
  */
 async function analyze(filename: string): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
-    const result = await getFeatures(filename);
+    // const result = await getFeatures(filename);
     // TODO: classify instrument with ML
-    return result;
+    return { filename }; // result;
 }
-
-ctx.addEventListener('message', (event) => {
-    console.log('worker', event);
-})
-// ctx.postmessage({});
 
 const analyzer = { analyze };
 
