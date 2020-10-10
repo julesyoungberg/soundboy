@@ -29,15 +29,15 @@ There will also need to be a directory for python data collection and training.
     - train an ML model for instrument classification, preferably we can find a pretrained model to adjust with our own samples.
     - load the model into the analyzer worker for sample library classication
 - Feature Extraction
-    - extract features from each sample (maybe using meyda - already installed)
-    - save features to the DB
-        - Document schema should be typed properly (currently lots of `Record<string, any>`)
+    - fix audio decoding
+    - improve:
+        - segmentation, rhythm, etc.
 - Interface
+    - seed script
     - need a way to select a folder for analysis
         - send folder name as a filename to the analyzer, recursively explore directories in the worker
     - need a way to view a list of samples and filter by perceptual features
         - E.g. filtering by `bright` may only return samples with a high enough spectral centroid
         - need to be able to drag samples from the list into a DAW or elsewhere
     - other views/visualizations?
-- IPC
-    - need a new method in `IpcService` for sending a single message and expecting a stream of messages back (for the analysis process)
+
