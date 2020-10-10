@@ -12,7 +12,7 @@ export default function Home() {
     const analyze = async () => {
         if (!ipcService) return;
         console.log('analyze');
-        await ipcService.analyze(folder || './samples');
+        await ipcService.analyze(folder);
     };
 
     const getSounds = async () => {
