@@ -1,10 +1,10 @@
 import { ipcMain } from 'electron';
 
-import AnalyzerChannel from './AnalyzerChannel';
 import Channel from './Channel';
-import SoundsChannel from './SoundsChannel';
+import FetchSoundsChannel from './FetchSoundsChannel';
+import InsertSoundChannel from './InsertSoundChannel';
 
-const channels: Channel[] = [new AnalyzerChannel('analyze'), new SoundsChannel('sounds')];
+const channels: Channel[] = [new FetchSoundsChannel('fetch_sounds'), new InsertSoundChannel('insert_sound')];
 
 export function registerIpcChannels() {
     console.log('Registering IPC Channels');
@@ -13,7 +13,6 @@ export function registerIpcChannels() {
         console.log(`Registering channel '${channel.name}'`);
         // register the ipc channel to the main process with it's corresponding handler
         ipcMain.on(channel.name, (event, request) => {
-            console.log('IPC message', channel.name, event, request);
             channel.handler(event, request);
         });
     });
