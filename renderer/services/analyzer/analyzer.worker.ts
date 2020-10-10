@@ -64,7 +64,7 @@ export async function getFeatures(filename: string): Promise<Sound> {
  * @param filename
  * @returns sound analysis data
  */
-async function analyze(filename: string): Promise<Sound> {
+export async function analyze(filename: string): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
     const result = await getFeatures(filename);
     // TODO: classify instrument with ML
@@ -75,4 +75,6 @@ const analyzer = { analyze };
 
 export type Analyzer = typeof analyzer;
 
-expose(analyzer);
+if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+    expose(analyzer);
+}
