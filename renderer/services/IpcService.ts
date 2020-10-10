@@ -72,10 +72,14 @@ export default class IpcService {
 
     async analyze(folder: string, callback?: (data: IPCResponse) => void) {
         analyzeSounds(folder, async (data: IPCResponse) => {
-            if (data.error || !data.result) {
+            if (data.error) {
                 console.error(`Error analyzing '${data.result?.filename}'`);
                 console.error(data.error);
                 callback?.(data);
+                return;
+            }
+
+            if (!data.result) {
                 return;
             }
 

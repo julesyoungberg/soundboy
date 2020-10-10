@@ -24,8 +24,10 @@ export function loadSound(filename: string) {
     return load(filename, {
         fetch(url: string) {
             return new Promise((resolve, reject) => {
+                console.log('loading', url);
                 fs.readFile(url, (err, data) => {
                     if (err) {
+                        console.error(err);
                         reject(err);
                     } else {
                         resolve(data.buffer);
@@ -55,6 +57,7 @@ export function toMono(buffer: AudioBuffer) {
 export async function getFeatures(filename: string): Promise<Sound> {
     const buffer: AudioBuffer = await loadSound(filename);
     const signal = toMono(buffer);
+    console.log('extracting features from', filename);
     const features = Meyda.extract(FEATURES as any, signal);
     return { ...features, filename };
 }

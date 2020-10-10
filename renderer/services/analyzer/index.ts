@@ -21,7 +21,7 @@ function getSoundFiles(folder: string) {
 export async function analyzeSounds(folder: string, callback: (data: IPCResponse) => void) {
     console.log('spawning analyzer worker');
 
-    const pool = Pool(() => spawn(new AnalyzerWorker()), 8);
+    const pool = Pool(() => spawn(new AnalyzerWorker()), 1);
 
     (await getSoundFiles(folder)).forEach((filename) => {
         pool.queue(async (analyzer) => {

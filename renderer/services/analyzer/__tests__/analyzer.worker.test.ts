@@ -1,13 +1,17 @@
 import path from 'path';
 
-import { loadSound } from '../analyzer.worker';
+import { analyze } from '../analyzer.worker';
 
-describe('loadSound', () => {
+jest.mock('meyda/dist/node', () => {
+    return jest.createMockFromModule('meyda');
+});
+
+describe('analyze', () => {
     it.each([
         ['clap.mp3'],
         ['kick.wav'],
         ['shaker.aiff']
-    ])(`can load %s`, async (filename: string) => {
-        await loadSound(path.resolve(__dirname, `./sounds/${filename}`));
+    ])(`analyzes %s`, async (filename: string) => {
+        await analyze(path.resolve(__dirname, `./sounds/${filename}`));
     });
 });
