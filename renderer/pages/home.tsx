@@ -4,7 +4,6 @@ import { Button, Heading, Text } from 'rebass';
 
 import SelectFolder from '../components/select-folder';
 import useIpcService from '../hooks/useIpcService';
-import * as analyzer from '../services/analyzer';
 
 export default function Home() {
     const ipcService = useIpcService();
@@ -13,8 +12,7 @@ export default function Home() {
     const analyze = async () => {
         if (!ipcService) return;
         console.log('analyze');
-        const res = await analyzer.analyze(folder || './samples'); //ipcService.analyze(folder || './samples');
-        console.log(res);
+        await ipcService.analyze(folder || './samples');
     };
 
     const getSounds = async () => {

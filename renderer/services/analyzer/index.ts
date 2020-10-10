@@ -1,6 +1,7 @@
+import glob from 'glob-promise';
 import { spawn, Pool } from 'threads';
 
-import glob from 'glob-promise';
+// eslint-disable-next-line
 import AnalyzerWorker from 'worker-loader?filename=static/[hash].worker.js!./analyzer.worker';
 
 /**
@@ -20,10 +21,6 @@ function getSoundFiles(folder: string) {
 export async function analyzeSounds(folder: string, callback: (data: IPCResponse) => void) {
     console.log('spawning analyzer worker');
 
-    // const worker = new AnalyzerWorker();
-    // console.log(await getSoundFiles(folder));
-    // worker.postMessage(folder);
-
     const pool = Pool(() => spawn(new AnalyzerWorker()), 8);
 
     (await getSoundFiles(folder)).forEach((filename) => {
@@ -40,8 +37,4 @@ export async function analyzeSounds(folder: string, callback: (data: IPCResponse
 
     await pool.settled();
     callback({ done: true });
-}
-
-export async function analyze(folder: string) {
-    analyzeSounds(folder, (data: IPCResponse) => console.log(data));
 }

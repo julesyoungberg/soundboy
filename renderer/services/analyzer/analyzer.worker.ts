@@ -1,9 +1,8 @@
 // import * as tf from '@tensorflow/tfjs-node';
 import load from 'audio-loader';
+import fs from 'fs';
 import Meyda from 'meyda/dist/node';
 import { expose } from 'threads/worker';
-
-const ctx: Worker = self as any;
 
 const FEATURES = [
     'chroma',
@@ -21,13 +20,29 @@ const FEATURES = [
     'spectralKurtosis',
 ];
 
+export function loadSound(filename: string) {
+    return load(filename, {
+        fetch(url: string) {
+            return new Promise((resolve, reject) => {
+                fs.readFile(url, (err, data) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(data.buffer);
+                    }
+                });
+            });
+        },
+    });
+}
+
 // convert a stereo signal to mono by averaging the two channels
 export function toMono(buffer: AudioBuffer) {
-    if (buffer.numberOfChannels == 1) {
+    if (buffer.numberOfChannels === 1) {
         return buffer.getChannelData(0);
     }
 
-    if (buffer.numberOfChannels == 2) {
+    if (buffer.numberOfChannels === 2) {
         const left = buffer.getChannelData(0);
         const right = buffer.getChannelData(0);
         return left.map((v, i) => (v + right[i]) / 2);
@@ -38,7 +53,7 @@ export function toMono(buffer: AudioBuffer) {
 
 // extract basic features from a sound file
 export async function getFeatures(filename: string): Promise<Sound> {
-    const buffer: AudioBuffer = await load(filename);
+    const buffer: AudioBuffer = await loadSound(filename);
     const signal = toMono(buffer);
     const features = Meyda.extract(FEATURES as any, signal);
     return { ...features, filename };
@@ -46,7 +61,7 @@ export async function getFeatures(filename: string): Promise<Sound> {
 
 /**
  * Main worker function for analyzing a sound file
- * @param filename 
+ * @param filename
  * @returns sound analysis data
  */
 async function analyze(filename: string): Promise<Sound> {
@@ -55,11 +70,6 @@ async function analyze(filename: string): Promise<Sound> {
     // TODO: classify instrument with ML
     return result;
 }
-
-ctx.addEventListener('message', (event) => {
-    console.log('worker', event);
-})
-// ctx.postmessage({});
 
 const analyzer = { analyze };
 

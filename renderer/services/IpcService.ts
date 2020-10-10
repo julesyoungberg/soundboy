@@ -2,6 +2,8 @@ import React from 'react';
 import { IpcRenderer } from 'electron';
 import Stream from 'stream';
 
+import { analyzeSounds } from './analyzer';
+
 export default class IpcService {
     private ipcRenderer?: IpcRenderer;
 
@@ -17,7 +19,7 @@ export default class IpcService {
 
     /**
      * Generic IPC channel send logic
-     * @param channel 
+     * @param channel
      * @param request
      */
     send(channel: string, request: IPCRequest = {}) {
@@ -36,8 +38,8 @@ export default class IpcService {
 
     /**
      * This method returns a promise which will be resolved when the response has arrived.
-     * @param channel 
-     * @param request 
+     * @param channel
+     * @param request
      */
     fetch(channel: string, request: IPCRequest = {}): Promise<IPCResponse> {
         this.send(channel, request);
@@ -48,9 +50,9 @@ export default class IpcService {
 
     /**
      * generator function that yields all IPC responses to request
-     * @param channel 
-     * @param request 
-     * @param callback 
+     * @param channel
+     * @param request
+     * @param callback
      */
     getStream(channel: string, request: IPCRequest): Stream.Readable {
         const stream = new Stream.Readable();
@@ -68,18 +70,27 @@ export default class IpcService {
         return stream;
     }
 
-    async analyze(folder: string) {
-        const stream = this.getStream('analyze', { params: [folder] });
-        const responses: IPCResponse[] = [];
-        for await (const response of stream) {
-            console.log(response);
-            responses.push(response);
-        }
-        return responses;
+    async analyze(folder: string, callback?: (data: IPCResponse) => void) {
+        analyzeSounds(folder, async (data: IPCResponse) => {
+            if (data.error || !data.result) {
+                console.error(`Error analyzing '${data.result?.filename}'`);
+                console.error(data.error);
+                callback?.(data);
+                return;
+            }
+
+            const result = await this.fetch('insert_sound', {
+                params: [JSON.stringify(data.result)],
+            });
+            console.log(result);
+            callback?.({ ...data, ...result });
+        });
     }
 
     async getSounds(query: Record<string, any>) {
-        const result = await this.fetch('sounds', { params: [JSON.stringify(query)] });
+        const result = await this.fetch('fetch_sounds', {
+            params: [JSON.stringify(query)],
+        });
         return result;
     }
 }
