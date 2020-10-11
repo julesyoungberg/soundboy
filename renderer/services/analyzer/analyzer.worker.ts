@@ -28,13 +28,11 @@ export function loadSound(filename: string) {
         decode,
         fetch(url: string) {
             return new Promise((resolve, reject) => {
-                console.log('loading', url);
                 fs.readFile(url, (err, data) => {
                     if (err) {
                         console.error(err);
                         reject(err);
                     } else {
-                        console.log('successfully loaded', url);
                         resolve(data.buffer);
                     }
                 });
@@ -69,8 +67,6 @@ export function toMono(buffer: AudioBuffer) {
 // TODO - check if power of 2
 export function powerOf2(buffer: AudioBuffer): AudioBuffer | Float32Array {
     const diff = diffFromPowerOfTwo(buffer.length);
-    console.log('buffer length:', buffer.length);
-    console.log('diff from power of 2:', diff);
     if (diff === 0) {
         return buffer;
     }
@@ -78,17 +74,17 @@ export function powerOf2(buffer: AudioBuffer): AudioBuffer | Float32Array {
     // Convert to mono and pad
     // TODO avoid converting to mono
     const buf = new Float32Array(buffer.length + diff).fill(0);
-    toMono(buffer).forEach((v, i) => (buf[i] = v));
+    toMono(buffer).forEach((v, i) => {
+        buf[i] = v;
+    });
     return buf;
 }
 
 // extract basic features from a sound file
 export async function getFeatures(filename: string): Promise<Sound> {
     const buffer = powerOf2(await loadSound(filename));
-    // console.log('converting to mono');
-    // const signal = toMono(buffer);
     console.log('extracting features from', filename);
-    const features = Meyda.extract(FEATURES as any, buffer); // signal);
+    const features = Meyda.extract(FEATURES as any, buffer);
     return { ...features, filename };
 }
 
@@ -108,6 +104,7 @@ const analyzer = { analyze };
 
 export type Analyzer = typeof analyzer;
 
+// eslint-disable-next-line
 if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
     expose(analyzer);
 }

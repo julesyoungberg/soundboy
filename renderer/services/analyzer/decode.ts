@@ -19,13 +19,13 @@ export default async function decode(buf: ArrayBufferLike) {
         }
     }
 
-    let type = getType(buffer);
-    if (!type) {
+    const t = getType(buffer);
+    if (!t) {
         throw new Error('Cannot detect audio format of buffer');
     }
 
     // direct wav decoder
-    if (type === 'wav') {
+    if (t === 'wav') {
         const audioData = await WavDecoder.decode(buffer);
         const audioBuffer = createBuffer(audioData.channelData, {
             channels: audioData.numberOfChannels,
@@ -34,6 +34,7 @@ export default async function decode(buf: ArrayBufferLike) {
         return audioBuffer;
     }
 
+    // TODO
     // handle other codecs by AV
     // return new Promise((resolve, reject) => {
     //     const asset = AV.Asset.fromBuffer(buffer);
