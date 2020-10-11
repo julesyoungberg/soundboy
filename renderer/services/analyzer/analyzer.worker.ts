@@ -1,8 +1,10 @@
 // import * as tf from '@tensorflow/tfjs-node';
-import load from 'audio-loader';
+import load from 'audio-loader/lib/index';
 import fs from 'fs';
-import Meyda from 'meyda/dist/node';
+import Meyda from 'meyda/dist/node/main';
 import { expose } from 'threads/worker';
+
+import decode from './decode';
 
 const FEATURES = [
     'chroma',
@@ -20,8 +22,10 @@ const FEATURES = [
     'spectralKurtosis',
 ];
 
+// audio-loader probably isn't needed, we specify all custom functions anyways
 export function loadSound(filename: string) {
     return load(filename, {
+        decode,
         fetch(url: string) {
             return new Promise((resolve, reject) => {
                 console.log('loading', url);
@@ -30,12 +34,21 @@ export function loadSound(filename: string) {
                         console.error(err);
                         reject(err);
                     } else {
+                        console.log('successfully loaded', url);
                         resolve(data.buffer);
                     }
                 });
             });
         },
     });
+}
+
+function diffFromPowerOfTwo(num: number): number {
+    let n = 2;
+    while (n < num) {
+        n *= 2;
+    }
+    return n - num;
 }
 
 // convert a stereo signal to mono by averaging the two channels
@@ -53,12 +66,29 @@ export function toMono(buffer: AudioBuffer) {
     throw new Error('unexpected number of channels');
 }
 
+// TODO - check if power of 2
+export function powerOf2(buffer: AudioBuffer): AudioBuffer | Float32Array {
+    const diff = diffFromPowerOfTwo(buffer.length);
+    console.log('buffer length:', buffer.length);
+    console.log('diff from power of 2:', diff);
+    if (diff === 0) {
+        return buffer;
+    }
+
+    // Convert to mono and pad
+    // TODO avoid converting to mono
+    const buf = new Float32Array(buffer.length + diff).fill(0);
+    toMono(buffer).forEach((v, i) => (buf[i] = v));
+    return buf;
+}
+
 // extract basic features from a sound file
 export async function getFeatures(filename: string): Promise<Sound> {
-    const buffer: AudioBuffer = await loadSound(filename);
-    const signal = toMono(buffer);
+    const buffer = powerOf2(await loadSound(filename));
+    // console.log('converting to mono');
+    // const signal = toMono(buffer);
     console.log('extracting features from', filename);
-    const features = Meyda.extract(FEATURES as any, signal);
+    const features = Meyda.extract(FEATURES as any, buffer); // signal);
     return { ...features, filename };
 }
 
