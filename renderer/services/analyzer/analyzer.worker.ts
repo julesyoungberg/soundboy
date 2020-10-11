@@ -1,7 +1,7 @@
 // import * as tf from '@tensorflow/tfjs-node';
 import load from 'audio-loader/lib/index';
 import fs from 'fs';
-import Meyda from 'meyda/dist/node/main';
+import meyda from 'meyda/dist/node/main';
 import { expose } from 'threads/worker';
 
 import decode from './decode';
@@ -14,7 +14,7 @@ const FEATURES = [
     'perceptualSpread',
     'spectralCentroid',
     'spectralFlatness',
-    'spectralFlux',
+    // 'spectralFlux',
     'spectralSlope',
     'spectralRolloff',
     'spectralSpread',
@@ -81,10 +81,12 @@ export function powerOf2(buffer: AudioBuffer): AudioBuffer | Float32Array {
 }
 
 // extract basic features from a sound file
+// TODO step through the sample rather than just using the first n samples
 export async function getFeatures(filename: string): Promise<Sound> {
-    const buffer = powerOf2(await loadSound(filename));
+    const buffer = toMono(await loadSound(filename));
     console.log('extracting features from', filename);
-    const features = Meyda.extract(FEATURES as any, buffer);
+    meyda.bufferSize = 2048;
+    const features = meyda.extract(FEATURES, buffer.slice(0, 2048), []);
     return { ...features, filename };
 }
 

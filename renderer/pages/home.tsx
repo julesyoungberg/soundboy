@@ -18,7 +18,7 @@ export default function Home() {
     const getSounds = async () => {
         if (!ipcService) return;
         console.log('getSounds');
-        const sounds = await ipcService.getSounds({ foo: 'bar' });
+        const sounds = await ipcService.getSounds({});
         console.log(sounds);
     };
 
