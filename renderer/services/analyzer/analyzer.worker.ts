@@ -64,7 +64,7 @@ export function toMono(buffer: AudioBuffer) {
     throw new Error('unexpected number of channels');
 }
 
-// TODO - check if power of 2
+// make sure an audio buffer has a length of power of two
 export function powerOf2(buffer: AudioBuffer): AudioBuffer | Float32Array {
     const diff = diffFromPowerOfTwo(buffer.length);
     if (diff === 0) {
