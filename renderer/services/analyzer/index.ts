@@ -1,5 +1,6 @@
 import glob from 'glob-promise';
-import {Pool, spawn} from 'threads';
+import { Pool, spawn } from 'threads';
+
 // eslint-disable-next-line
 import AnalyzerWorker from 'worker-loader?filename=static/[hash].worker.js!./analyzer.worker';
 
@@ -8,7 +9,9 @@ import AnalyzerWorker from 'worker-loader?filename=static/[hash].worker.js!./ana
  * @param folder
  * @returns an array of sound file names
  */
-function getSoundFiles(folder: string) { return glob.promise(`${folder}/**/*.{mp3,wav,aif,flac}`); }
+function getSoundFiles(folder: string) {
+    return glob.promise(`${folder}/**/*.{mp3,wav,aif,flac}`);
+}
 
 /**
  * This function spawns a worker thread to analyze the given sound files
@@ -27,13 +30,13 @@ export async function analyzeSounds(folder: string, callback: (data: IPCResponse
             try {
                 const result = await analyzer.analyze(filename);
                 // await db.sounds.insert(result);
-                callback({result});
+                callback({ result });
             } catch (error) {
-                callback({error, result : {filename}});
+                callback({ error, result: { filename } });
             }
         });
     });
 
     await pool.settled();
-    callback({done : true});
+    callback({ done: true });
 }
