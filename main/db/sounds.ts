@@ -8,6 +8,7 @@ class Sounds {
         this.db = dbFactory('sounds.db');
     }
 
+    // TODO validation - ajx? - make sure no duplicates
     async insert(data: Record<string, any>) {
         console.log('sounds db insert: ', data);
         const result = await this.db.insert(data);
