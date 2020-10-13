@@ -70,8 +70,12 @@ export default class IpcService {
         return stream;
     }
 
+    async clearSounds() {
+        await this.fetch('clear_sounds', {});
+    }
+
     async analyze(folder: string, callback?: (data: IPCResponse) => void) {
-        analyzeSounds(folder, async (data: IPCResponse) => {
+        await analyzeSounds(folder, async (data: IPCResponse) => {
             if (data.error) {
                 console.error(`Error analyzing '${data.result?.filename}'`);
                 console.error(data.error);

@@ -1,4 +1,4 @@
-import { app } from 'electron';
+import { app, protocol } from 'electron';
 import serve from 'electron-serve';
 
 import createWindow from './create-window';
@@ -33,4 +33,16 @@ if (isProd) {
 
 app.on('window-all-closed', () => {
     app.quit();
+});
+
+app.on('ready', async () => {
+    const protocolName = 'audio';
+    protocol.registerFileProtocol(protocolName, (request, callback) => {
+        const url = request.url.replace(`${protocolName}://`, '');
+        try {
+            return callback(decodeURIComponent(url));
+        } catch (error) {
+            console.error(error);
+        }
+    });
 });
