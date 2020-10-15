@@ -21,6 +21,14 @@ class Sounds {
         const result = await this.db.find(query);
         return result as any;
     }
+
+    async clear() {
+        await this.db.remove({}, { multi: true }, (err, numRemoved) => {
+            this.db.loadDatabase((err) => {
+                if (err) console.log(err);
+            });
+        });
+    }
 }
 
 const sounds = new Sounds();

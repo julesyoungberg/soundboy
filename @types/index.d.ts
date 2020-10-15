@@ -6,6 +6,7 @@ declare module '@rebass/preset';
 
 // read about the audio features here: https://meyda.js.org/audio-features
 interface Sound {
+    _id?: string;
     chroma?: number[];
     filename: string;
     instrument?: string;
