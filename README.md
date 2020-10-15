@@ -31,6 +31,7 @@ There will also need to be a directory for python data collection and training.
         -   determine if melodic or one hit
     -   tagging
         -   either aliases for queries (mainly frontend) or computed more intelligently at extraction time (maybe use ML here too? \shrug)
+    -   rhythm
 -   Interface
     -   reanalyze button and functionality
     -   analyzation improvements
