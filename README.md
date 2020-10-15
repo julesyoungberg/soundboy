@@ -31,6 +31,9 @@ There will also need to be a directory for python data collection and training.
         -   determine if melodic or one hit
 -   Interface
     -   reanalyze button and functionality
+    -   analyzation improvements
+        -   show progress bar at bottom (maybe show most recently analyzed song in batch)
+        -   show pop up after analyzation with any failed songs
     -   design improvments (icons, colors)
     -   filter samples by perceptual features
         -   use buttons to generate NeDB queries
@@ -39,4 +42,4 @@ There will also need to be a directory for python data collection and training.
     -   other views/visualizations?
 -   Application
     -   validate sound documents on insert
-        -   do not import same sound twice (notify user)
+        -   overwrite documents with same filename
