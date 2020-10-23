@@ -1,5 +1,7 @@
 import { IpcMainEvent } from 'electron';
 
+import { IPCRequest } from '../../@types';
+
 export default abstract class Channel {
     constructor(readonly name: string) {}
 

@@ -2,6 +2,8 @@ import React from 'react';
 import { IpcRenderer } from 'electron';
 import Stream from 'stream';
 
+import { IPCRequest, IPCResponse } from '../../@types';
+
 import { analyzeSounds } from './analyzer';
 
 export default class IpcService {

@@ -1,40 +1,46 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import Head from 'next/head';
-import { Button, Heading, Text } from 'rebass';
+import { Button, Heading } from 'rebass';
 
+import { Sound } from '../../@types';
 import SelectFolder from '../components/select-folder';
 import Samples from '../components/samples';
 import useIpcService from '../hooks/useIpcService';
 
 export default function Home() {
     const ipcService = useIpcService();
-    const [folder, setFolder] = useState();
     const [sounds, setSounds] = useState<Sound[]>([]);
-    useEffect(() => {
-        if (!ipcService) return;
-        reloadSounds();
-    }, [ipcService]);
-    const clear = async () => {
-        if (!ipcService) return;
-        await ipcService.clearSounds();
-        reloadSounds();
-    };
+
     const analyze = async (folder) => {
         if (!ipcService) return;
         console.log('analyze');
         await ipcService.analyze(folder);
     };
-    const getSounds = async () => {
-        if (!ipcService) return;
+
+    const getSounds = useCallback(async () => {
+        if (!ipcService) return [];
         console.log('getSounds');
         const { results } = await ipcService.getSounds({});
         console.log(results);
         return results;
-    };
+    }, [ipcService]);
+
     const reloadSounds = useCallback(async () => {
-        const sounds = await getSounds();
-        setSounds(sounds);
+        const mSounds = await getSounds();
+        setSounds(mSounds);
     }, [setSounds, getSounds]);
+
+    const clear = async () => {
+        if (!ipcService) return;
+        await ipcService.clearSounds();
+        reloadSounds();
+    };
+
+    useEffect(() => {
+        if (!ipcService) return;
+        reloadSounds();
+    }, [ipcService, reloadSounds]);
+
     const onSelect = async (path) => {
         await analyze(path);
         reloadSounds();

@@ -1,4 +1,7 @@
 import Datastore from 'nedb-promises';
+
+import { Sound } from '../../@types';
+
 import dbFactory from './dbFactory';
 
 class Sounds {
@@ -22,11 +25,12 @@ class Sounds {
     }
 
     async clear() {
-        await this.db.remove({}, { multi: true }, (err, numRemoved) => {
-            this.db.loadDatabase((err) => {
-                if (err) console.log(err);
-            });
-        });
+        // await this.db.remove({}, { multi: true }, (err, numRemoved) => {
+        //     this.db.loadDatabase((err) => {
+        //         if (err) console.log(err);
+        //     });
+        // });
+        await this.db.remove({}, { multi: true });
     }
 }
 

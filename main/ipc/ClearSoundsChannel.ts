@@ -1,7 +1,9 @@
 import { IpcMainEvent } from 'electron';
 
-import Channel from './Channel';
+import { IPCRequest, IPCResponse } from '../../@types';
 import db from '../db';
+
+import Channel from './Channel';
 
 export default class ClearSoundsChannel extends Channel {
     /**
@@ -12,7 +14,7 @@ export default class ClearSoundsChannel extends Channel {
     async handler(event: IpcMainEvent, request: IPCRequest) {
         console.log('ClearSoundsChannel request: ', request.params);
         const responseChannel = this.getResponseChannel(request);
-        let reply: IPCResponse = {};
+        const reply: IPCResponse = {};
         await db.sounds.clear();
         event.sender.send(responseChannel, JSON.stringify(reply));
     }

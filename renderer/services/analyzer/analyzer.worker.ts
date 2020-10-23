@@ -1,15 +1,11 @@
 import load from 'audio-loader/lib/index';
 import fs from 'fs';
-import meyda from 'meyda/dist/node/main';
 import { expose } from 'threads/worker';
 
 import { Sound } from '../../../@types';
 
 import AnalyzerEngine from './analyzer-engine';
 import decode from './decode';
-
-const HOP_SIZE = 512;
-const FRAME_SIZE = 2048;
 
 const FEATURES = [
     'chroma',

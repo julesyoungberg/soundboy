@@ -1,11 +1,3 @@
-import { NumericDataType } from '@tensorflow/tfjs-node';
-
-declare module 'audio-loader';
-
-declare module 'rebass';
-
-declare module '@rebass/preset';
-
 export interface Feature {
     mean: number;
     variance: number;
@@ -31,7 +23,7 @@ export interface Sound {
     spectralFlux?: Feature;
     spectralSlope?: Feature;
     spectralRolloff?: Feature;
-    spectralSpread?: Fature;
+    spectralSpread?: Feature;
     spectralSkewness?: Feature;
     spectralKurtosis?: Feature;
 }

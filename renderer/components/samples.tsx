@@ -1,5 +1,8 @@
 import React from 'react';
 import { Box } from 'rebass';
+
+import { Sound } from '../../@types';
+
 import Sample from './sample';
 
 const Samples = ({ sounds = [] }: { sounds: Sound[] }) => (

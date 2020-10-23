@@ -1,7 +1,7 @@
 import * as tf from '@tensorflow/tfjs-node';
 import meyda from 'meyda/dist/node/main';
 
-import { Sound } from '../../../@types';
+import { ArrayFeature, Feature, Sound } from '../../../@types';
 
 interface AnalyzerOptions {
     frameSize?: number;
@@ -44,8 +44,8 @@ const initialFeatureTracks = (): FeatureTracks => ({
  * Analyzer engine class
  */
 export default class AnalyzerEngine {
-    hopSize: number = 0;
-    frameSize: number = 0;
+    frameSize = 2048;
+    hopSize = 512;
 
     constructor(readonly features: string[], config: AnalyzerOptions = {}) {
         this.frameSize = config.frameSize || 2048;
@@ -76,7 +76,7 @@ export default class AnalyzerEngine {
             this.features.forEach((feature) => {
                 const val = features[feature];
 
-                if (feature == 'loudness') {
+                if (feature === 'loudness') {
                     results[feature]?.push(val.total);
                 } else {
                     results[feature]?.push(val);
@@ -98,22 +98,23 @@ export default class AnalyzerEngine {
             const stats = tf.moments(t, [0]);
             const mean = stats.mean.dataSync();
             const variance = stats.mean.dataSync();
+            let data: Feature | ArrayFeature | undefined;
 
             if (['chroma', 'mfcc'].includes(feature)) {
                 // convert array featurs to plain array
-                result[feature] = {
+                data = {
                     mean: Array.from(mean),
                     variance: Array.from(variance),
                 };
             } else {
                 // get single value for regular features
-                result[feature] = {
+                data = {
                     mean: mean[0],
                     variance: variance[0],
                 };
             }
 
-            return result;
+            return { ...result, [feature]: data };
         }, {});
     }
 

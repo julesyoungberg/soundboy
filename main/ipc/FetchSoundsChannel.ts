@@ -1,7 +1,9 @@
 import { IpcMainEvent } from 'electron';
 
-import Channel from './Channel';
+import { IPCRequest, IPCResponse } from '../../@types';
 import db from '../db';
+
+import Channel from './Channel';
 
 export default class FetchSoundsChannel extends Channel {
     /**
