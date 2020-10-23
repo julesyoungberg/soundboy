@@ -1,38 +1,47 @@
+import { NumericDataType } from "@tensorflow/tfjs-node";
+
 declare module 'audio-loader';
 
 declare module 'rebass';
 
 declare module '@rebass/preset';
 
-// read about the audio features here: https://meyda.js.org/audio-features
-interface Sound {
-    _id?: string;
-    chroma?: number[];
-    filename: string;
-    instrument?: string;
-    loudness?: {
-        specific: Float32Array;
-        total: number;
-    };
-    mfcc?: number[];
-    perceptualSharpness?: number;
-    perceptualSpread?: number;
-    spectralCentroid?: number;
-    spectralFlatness?: number;
-    spectralFlux?: number;
-    spectralSlope?: number;
-    spectralRolloff?: number;
-    spectralSpread?: number;
-    spectralSkewness?: number;
-    spectralKurtosis?: number;
+export interface Feature {
+    mean: number;
+    variance: number;
 }
 
-interface IPCRequest {
+export interface ArrayFeature {
+    mean: number[];
+    variance: number[];
+}
+
+// read about the audio features here: https://meyda.js.org/audio-features
+export interface Sound {
+    _id?: string;
+    filename: string;
+    chroma?: ArrayFeature;
+    instrument?: Feature;
+    loudness?: Feature;
+    mfcc?: ArrayFeature;
+    perceptualSharpness?: Feature;
+    perceptualSpread?: Feature;
+    spectralCentroid?: Feature;
+    spectralFlatness?: Feature;
+    spectralFlux?: Feature;
+    spectralSlope?: Feature;
+    spectralRolloff?: Feature;
+    spectralSpread?: Fature;
+    spectralSkewness?: Feature;
+    spectralKurtosis?: Feature;
+}
+
+export interface IPCRequest {
     responseChannel?: string;
     params?: string[];
 }
 
-interface IPCResponse {
+export interface IPCResponse {
     done?: boolean;
     error?: string;
     result?: Sound;

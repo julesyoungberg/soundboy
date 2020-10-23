@@ -16,7 +16,6 @@ class Sounds {
     }
 
     async fetch(query: Record<string, any>): Promise<Sound[]> {
-        // TODO: use the query
         console.log('sounds db fetch: ', query);
         const result = await this.db.find(query);
         return result as any;
