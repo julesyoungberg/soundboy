@@ -13,7 +13,7 @@ interface FeatureTracks {
     loudness?: number[];
     mfcc?: number[][];
     perceptualSharpness?: number[];
-    perceptualSpread?: number[]
+    perceptualSpread?: number[];
     spectralCentroid?: number[];
     spectralFlatness?: number[];
     spectralFlux?: number[];
@@ -49,12 +49,12 @@ export default class AnalyzerEngine {
 
     constructor(readonly features: string[], config: AnalyzerOptions = {}) {
         this.frameSize = config.frameSize || 2048;
-        this.hopSize = config.hopSize || 512;   
+        this.hopSize = config.hopSize || 512;
     }
 
     /**
      * hops through buffer analyzing each window
-     * @param buffer 
+     * @param buffer
      */
     getFeatureTracks(buffer: Float32Array): FeatureTracks {
         const results = initialFeatureTracks();
@@ -67,7 +67,7 @@ export default class AnalyzerEngine {
             const end = Math.min(buffer.length, offset + this.frameSize);
             const frame = new Float32Array(this.frameSize).fill(0);
             frame.set(buffer.slice(offset, end));
-        
+
             // TODO double check meyda applys a window internally
             const features = meyda.extract(this.features, frame, prevFrame);
             prevFrame = frame;
@@ -89,7 +89,7 @@ export default class AnalyzerEngine {
 
     /**
      * computes stats for each feature
-     * @param featureTracks 
+     * @param featureTracks
      */
     computeFeatureStats(featureTracks: FeatureTracks): Partial<Sound> {
         return Object.keys(featureTracks).reduce((result, feature) => {
@@ -104,7 +104,7 @@ export default class AnalyzerEngine {
                 result[feature] = {
                     mean: Array.from(mean),
                     variance: Array.from(variance),
-                 };
+                };
             } else {
                 // get single value for regular features
                 result[feature] = {
@@ -119,7 +119,7 @@ export default class AnalyzerEngine {
 
     /**
      * Main algorithm that takes a signal buffer and returns feature stats;
-     * @param buffer 
+     * @param buffer
      */
     analyze(buffer: Float32Array): Partial<Sound> {
         const featureTracks = this.getFeatureTracks(buffer);

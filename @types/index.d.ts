@@ -1,4 +1,4 @@
-import { NumericDataType } from "@tensorflow/tfjs-node";
+import { NumericDataType } from '@tensorflow/tfjs-node';
 
 declare module 'audio-loader';
 

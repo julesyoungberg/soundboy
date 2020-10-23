@@ -8,8 +8,8 @@ import { Sound } from '../../../@types';
 import AnalyzerEngine from './analyzer-engine';
 import decode from './decode';
 
-const HOP_SIZE = 512
-const FRAME_SIZE = 2048
+const HOP_SIZE = 512;
+const FRAME_SIZE = 2048;
 
 const FEATURES = [
     'chroma',
