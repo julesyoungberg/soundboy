@@ -1,4 +1,4 @@
-import * as tf from '@tensorflow/tfjs-node';
+import * as tf from '@tensorflow/tfjs';
 import meyda from 'meyda/dist/node/main';
 
 import { ArrayFeature, Feature, Sound } from '../../../@types';
@@ -42,6 +42,8 @@ const initialFeatureTracks = (): FeatureTracks => ({
 
 /**
  * Analyzer engine class
+ * - allows configuration to be shared between sounds
+ * - holds the core signal processes logic for Soundboy
  */
 export default class AnalyzerEngine {
     frameSize = 2048;
@@ -61,7 +63,7 @@ export default class AnalyzerEngine {
         meyda.bufferSize = this.frameSize;
         let prevFrame = new Float32Array();
 
-        // hop through bugger
+        // hop through buffer
         for (let offset = 0; offset < buffer.length; offset += this.hopSize) {
             // get frame from buffer
             const end = Math.min(buffer.length, offset + this.frameSize);
@@ -119,7 +121,7 @@ export default class AnalyzerEngine {
     }
 
     /**
-     * Main algorithm that takes a signal buffer and returns feature stats;
+     * Main algorithm that takes a signal buffer and returns feature stats
      * @param buffer
      */
     analyze(buffer: Float32Array): Partial<Sound> {

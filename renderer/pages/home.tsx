@@ -45,6 +45,9 @@ export default function Home() {
         await analyze(path);
         reloadSounds();
     };
+
+    console.log(sounds);
+
     return (
         <>
             <Head>

@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "nextron",
     "build": "nextron build",
+    "build:worker": "ncc build worker/analyzer.worker.ts -o renderer/public/analyzer.worker -m",
     "postinstall": "electron-builder install-app-deps",
     "prettier": "prettier --list-different --write './**/*.{j,t}s?(x)'",
     "prettier:check": "prettier --check './**/*.{j,t}s?(x)'",
@@ -29,7 +30,7 @@
     "@emotion/core": "^10.0.35",
     "@emotion/styled": "^10.0.27",
     "@rebass/preset": "^4.0.5",
-    "@tensorflow/tfjs-node": "^2.6.0",
+    "@tensorflow/tfjs": "^2.6.0",
     "@types/jest": "^26.0.14",
     "@types/meyda": "^4.3.1",
     "@types/node": "^14.11.8",

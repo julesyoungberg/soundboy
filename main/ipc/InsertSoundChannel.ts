@@ -12,7 +12,6 @@ export default class AnalyzerChannel extends Channel {
      * @param request
      */
     async handler(event: IpcMainEvent, request: IPCRequest) {
-        console.log('InsertChannel request: ', request.params);
         const responseChannel = this.getResponseChannel(request);
         const data = request.params?.[0];
         if (!data) {
