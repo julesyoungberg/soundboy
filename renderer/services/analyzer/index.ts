@@ -1,6 +1,8 @@
 import glob from 'glob-promise';
 import { Pool, spawn } from 'threads';
 
+import { IPCResponse } from '../../../@types';
+
 // eslint-disable-next-line
 import AnalyzerWorker from 'worker-loader?filename=static/[hash].worker.js!./analyzer.worker';
 

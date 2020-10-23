@@ -5,7 +5,7 @@ import { expose } from 'threads/worker';
 
 import { Sound } from '../../../@types';
 
-import Analyzer from './analyzer';
+import AnalyzerEngine from './analyzer-engine';
 import decode from './decode';
 
 const HOP_SIZE = 512
@@ -27,7 +27,7 @@ const FEATURES = [
     'spectralKurtosis',
 ];
 
-const analyzer = new Analyzer(FEATURES);
+const engine = new AnalyzerEngine(FEATURES);
 
 // audio-loader probably isn't needed, we specify all custom functions anyways
 export function loadSound(filename: string) {
@@ -67,7 +67,7 @@ export function toMono(buffer: AudioBuffer) {
 export async function getFeatures(filename: string): Promise<Sound> {
     console.log('extracting features from', filename);
     const buffer = toMono(await loadSound(filename));
-    const features = analyzer.analyze(buffer);
+    const features = engine.analyze(buffer);
     return { filename, ...features };
 }
 
@@ -85,7 +85,7 @@ export async function analyze(filename: string): Promise<Sound> {
 
 const analyzerWorker = { analyze };
 
-export type AnalyzerWorker = typeof analyzer;
+export type AnalyzerWorker = typeof analyzerWorker;
 
 // eslint-disable-next-line
 if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {

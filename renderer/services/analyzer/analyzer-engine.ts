@@ -43,7 +43,7 @@ const initialFeatureTracks = (): FeatureTracks => ({
 /**
  * Analyzer engine class
  */
-export default class Analyzer {
+export default class AnalyzerEngine {
     hopSize: number = 0;
     frameSize: number = 0;
 
