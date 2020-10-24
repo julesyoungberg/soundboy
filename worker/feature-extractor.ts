@@ -130,6 +130,13 @@ export default class FeatureExtractor {
                     mean: mean[0],
                     variance: variance[0],
                 };
+
+                if (data.mean == null || data.variance == null) {
+                    console.log('NULL ----');
+                    console.log('featureTrack', featureTrack);
+                    console.log('mean', mean);
+                    console.log('variance', variance);
+                }
             }
 
             return { ...result, [feature]: data };

@@ -21,7 +21,7 @@ export default class AnalyzerChannel extends Channel {
      */
     async handler(event: IpcMainEvent, request: IpcRequest) {
         console.log('AnalyzerChannel request: ', request.params);
-        const responseChannel = this.getResponseChannel(request);
+        const responseChannel = this.getResponseChannel();
 
         const folder = request.params?.[0];
         if (!folder) {
@@ -30,6 +30,7 @@ export default class AnalyzerChannel extends Channel {
         }
 
         const sendUpdate = (data: IpcResponse) => {
+            console.log('sending update to', responseChannel);
             event.sender.send(responseChannel, data);
         };
 

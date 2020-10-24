@@ -12,7 +12,7 @@ export default class InsertSoundChannel extends Channel {
      * @param request
      */
     async handler(event: IpcMainEvent, request: IpcRequest) {
-        const responseChannel = this.getResponseChannel(request);
+        const responseChannel = this.getResponseChannel();
         const data = request.params?.[0];
         if (!data) {
             // TODO: error message
@@ -22,11 +22,11 @@ export default class InsertSoundChannel extends Channel {
         let reply: IpcResponse = {};
 
         try {
-            await db.sounds.insert(JSON.parse(data));
+            await db.sounds.insert(data);
         } catch (error) {
             reply = { error };
         }
 
-        event.sender.send(responseChannel, JSON.stringify(reply));
+        event.sender.send(responseChannel, reply);
     }
 }

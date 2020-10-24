@@ -55,9 +55,10 @@ export default class Analyzer {
 
         ipcMain.on(RESULTS_CHANNEL, this.resultHandler);
 
-        console.log('spawning workers');
+        const numWorkers = Math.min(numTasks, NUM_WORKERS);
+        console.log(`spawning ${numWorkers} workers`);
         // spawn workers and assign tasks
-        for (let i = 0; i < Math.min(numTasks, NUM_WORKERS); i++) {
+        for (let i = 0; i < numWorkers; i++) {
             const worker = createWorkerWindow();
             this.workers.push(worker);
             worker.webContents.on('dom-ready', () => this.assignTaskTo(i));
@@ -71,13 +72,8 @@ export default class Analyzer {
      * @param event
      * @param request
      */
-    async resultHandler(event: IpcMainEvent, data: string) {
-        console.log(`resultHandler()`);
-        let result: AnalyzerMessage | undefined;
-
+    async resultHandler(event: IpcMainEvent, result: AnalyzerMessage) {
         try {
-            result = JSON.parse(data);
-            console.log(result);
             if (!this.workers[result?.workerID]) {
                 console.log('MISSING WORKER ID');
                 // this is a message from an unknown worker
@@ -118,10 +114,10 @@ export default class Analyzer {
 
     private taskAssignment(workerID: number) {
         const filename = this.tasks.shift();
-        return JSON.stringify({
+        return {
             sound: { filename },
             workerID,
-        });
+        };
     }
 
     private assignTaskTo(id: number) {

@@ -13,13 +13,13 @@ class Sounds {
 
     // TODO validation - ajx? - make sure no duplicates
     async insert(data: Record<string, any>) {
-        console.log('sounds db insert: ', data);
+        // console.log('sounds db insert: ', data);
         const result = await this.db.insert(data);
         return result;
     }
 
     async fetch(query: Record<string, any>): Promise<Sound[]> {
-        console.log('sounds db fetch: ', query);
+        // console.log('sounds db fetch: ', query);
         const result = await this.db.find(query);
         return result as any;
     }

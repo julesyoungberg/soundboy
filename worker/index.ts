@@ -14,18 +14,8 @@ console.log(`Listening for tasks on channel: ${TASKS_CHANNEL}`);
  * Main worker logic
  * given a filename, load it, analyze it, return the results
  */
-ipcRenderer.on(TASKS_CHANNEL, async (_event: IpcRendererEvent, raw: string) => {
-    console.log('Received task', raw);
-    let data: AnalyzerMessage | undefined;
-    try {
-        data = JSON.parse(raw);
-    } catch (error) {
-        console.error(error);
-        ipcRenderer.send(RESULTS_CHANNEL, JSON.stringify({ error }));
-        return;
-    }
-
-    console.log('worker ID: ', data.workerID);
+ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMessage) => {
+    console.log('Received task - worker ID: ', data.workerID);
 
     const reply = (res: Partial<AnalyzerMessage>) => {
         const response = {
@@ -33,7 +23,7 @@ ipcRenderer.on(TASKS_CHANNEL, async (_event: IpcRendererEvent, raw: string) => {
             workerID: data.workerID,
         };
         console.log('responding with:', response);
-        ipcRenderer.send(RESULTS_CHANNEL, JSON.stringify(response));
+        event.sender.send(RESULTS_CHANNEL, response);
     };
 
     if (!data.sound.filename) {

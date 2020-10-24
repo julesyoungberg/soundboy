@@ -29,8 +29,7 @@ export interface Sound {
 }
 
 export interface IpcRequest {
-    responseChannel?: string;
-    params?: string[];
+    params?: any[];
 }
 
 export interface IpcResponse {

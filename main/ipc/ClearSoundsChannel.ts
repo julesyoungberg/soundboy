@@ -13,9 +13,9 @@ export default class ClearSoundsChannel extends Channel {
      */
     async handler(event: IpcMainEvent, request: IpcRequest) {
         console.log('ClearSoundsChannel request: ', request.params);
-        const responseChannel = this.getResponseChannel(request);
+        const responseChannel = this.getResponseChannel();
         const reply: IpcResponse = {};
         await db.sounds.clear();
-        event.sender.send(responseChannel, JSON.stringify(reply));
+        event.sender.send(responseChannel, reply);
     }
 }

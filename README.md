@@ -26,14 +26,11 @@ There will also need to be a directory for python data collection and training.
     -   train an ML model for instrument classification, preferably we can find a pretrained model to adjust with our own samples.
     -   load the model into the analyzer worker for sample library classication
 -   Feature Extraction
-    -   support mp3, aiff, flac
-    -   hop through sample manually or with Web Audio Offline Context for NodeJS
     -   segmentation
         -   determine if melodic or one hit
-    -   tagging
-        -   either aliases for queries (mainly frontend) or computed more intelligently at extraction time (maybe use ML here too? \shrug)
     -   rhythm
 -   Interface
+    -   keep track of progress during analyzation
     -   reanalyze button and functionality
     -   analyzation improvements
         -   show progress bar at bottom (maybe show most recently analyzed song in batch)

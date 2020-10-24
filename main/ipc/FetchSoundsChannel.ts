@@ -13,7 +13,7 @@ export default class FetchSoundsChannel extends Channel {
      */
     async handler(event: IpcMainEvent, request: IpcRequest) {
         console.log('FetchSoundsChannel request: ', request.params);
-        const responseChannel = this.getResponseChannel(request);
+        const responseChannel = this.getResponseChannel();
         const query = request.params?.[0];
         if (!query) {
             // TODO: error message
@@ -23,12 +23,12 @@ export default class FetchSoundsChannel extends Channel {
         let reply: IpcResponse = {};
 
         try {
-            const results = await db.sounds.fetch(JSON.parse(query));
+            const results = await db.sounds.fetch(query);
             reply = { results };
         } catch (error) {
             reply = { error };
         }
 
-        event.sender.send(responseChannel, JSON.stringify(reply));
+        event.sender.send(responseChannel, reply);
     }
 }
