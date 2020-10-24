@@ -110,7 +110,9 @@ export default class FeatureExtractor {
      */
     computeFeatureStats(featureTracks: FeatureTracks): Partial<Sound> {
         return Object.keys(featureTracks).reduce((result, feature) => {
-            const featureTrack = featureTracks[feature].map((item) => (Array.isArray(item) || !isNaN(item) ? item : 0));
+            const featureTrack = featureTracks[feature].map((item) =>
+                Array.isArray(item) || !Number.isNaN(item) ? item : 0
+            );
             const t = tf.tensor(featureTrack);
             // compute stats
             const stats = tf.moments(t, [0]);

@@ -72,7 +72,7 @@ export default class IpcService {
 
     async analyze(folder: string, dispatch: (a: Action) => void) {
         const soundfiles = await getSoundFiles(folder);
-        dispatch({ type: 'analyzer_start', payload: { soundfiles }});
+        dispatch({ type: 'analyzer_start', payload: { soundfiles } });
 
         this.getStream('analyze_sounds', { params: [folder] }, (data: IpcResponse) => {
             if (data.error) {
@@ -85,10 +85,12 @@ export default class IpcService {
         });
     }
 
-    async getSounds(query: Record<string, any>) {
+    async getSounds(query: Record<string, any>, dispatch: (a: Action) => void) {
+        dispatch({ type: 'fetch_sounds_request' });
         const result = await this.fetch('fetch_sounds', {
             params: [query],
         });
+        dispatch({ type: 'fetch_sounds_response', payload: result });
         return result;
     }
 }

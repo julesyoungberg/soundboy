@@ -9,21 +9,28 @@ const Container = styled.div`
     margin-top: 10px;
 `;
 
+const ErrorMessage = styled.small`
+    margin-top: 10px;
+    color: red;
+`;
+
 export default function AnalyzerProgress() {
-    const { state } = useAppState();
+    const { state: { analyzer } } = useAppState();
     const theme = useTheme();
 
-    if (state.analyzer.tasks.length === 0) {
+    if (analyzer.tasks.length === 0) {
         // the analyzer is not running nor did it just finish
         return null;
     }
 
-    const percent = (state.analyzer.completed / state.analyzer.tasks.length) * 100;
+    const percent = (analyzer.completed / analyzer.tasks.length) * 100;
+    const error = analyzer.errors.length > 0 ? analyzer.errors[analyzer.errors.length - 1] : undefined;
 
     return (
         <Container>
-            <small>Analyzing... {state.analyzer.latest || ''}</small>
+            <small>Analyzing... {analyzer.latest || ''}</small>
             <Line percent={percent} strokeColor={theme.colors.secondary} />
+            {error && <ErrorMessage>{error}</ErrorMessage>}
         </Container>
     );
 }

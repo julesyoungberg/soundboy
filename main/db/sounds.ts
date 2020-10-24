@@ -21,7 +21,8 @@ class Sounds {
             return result;
         } catch (error) {
             // it failed, try to update incase it exists
-            await this.update(data);
+            const result = await this.update(data);
+            return result;
         }
     }
 

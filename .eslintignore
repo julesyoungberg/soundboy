@@ -2,4 +2,4 @@
 app
 node_modules
 .next
-worker/public
+worker/dist

@@ -23,16 +23,15 @@ export default class AnalyzerChannel extends Channel {
         console.log('AnalyzerChannel request: ', request.params);
         const responseChannel = this.getResponseChannel();
 
-        const folder = request.params?.[0];
-        if (!folder) {
-            // TODO: error message
-            return;
-        }
-
         const sendUpdate = (data: IpcResponse) => {
-            console.log('sending update to', responseChannel);
             event.sender.send(responseChannel, data);
         };
+
+        const folder = request.params?.[0];
+        if (!folder) {
+            sendUpdate({ error: 'No folder specified' });
+            return;
+        }
 
         this.analyzer.analyze(folder, sendUpdate);
     }

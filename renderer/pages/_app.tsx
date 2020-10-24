@@ -5,8 +5,8 @@ import { ThemeProvider } from 'emotion-theming';
 import type { AppProps } from 'next/app';
 
 import IpcService, { IpcContext } from '../services/IpcService';
-import { initialState, StateContext } from '../state'
-import reducer from '../state/reducer'
+import { initialState, StateContext } from '../state';
+import reducer from '../state/reducer';
 import theme from '../theme';
 
 const global = css`
