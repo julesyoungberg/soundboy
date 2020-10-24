@@ -7,7 +7,7 @@ jest.mock('meyda/dist/node', () => {
 });
 
 describe('analyze', () => {
-    it.each([['clap.mp3'], ['kick.wav'], ['shaker.aiff']])(`analyzes %s`, async (filename: string) => {
+    it.each([['clap.mp3'], ['kick.wav'], ['bonga.wav'], ['shaker.aiff']])(`analyzes %s`, async (filename: string) => {
         const features = await analyze(path.resolve(__dirname, `./sounds/${filename}`));
         console.log(features);
     });

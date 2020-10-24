@@ -101,9 +101,10 @@ export default class Analyzer {
             // kill worker since there's no more work
             console.log('killing worker');
             this.workers[result.workerID].close();
+            this.workers[result.workerID] = undefined;
 
             // check if done
-            if (this.workers.length === 0) {
+            if (this.workers.every((worker) => worker === undefined)) {
                 // this is the last worker, we're done here
                 this.callback({ done: true });
                 this.workers = [];

@@ -111,8 +111,9 @@ export default class FeatureExtractor {
      */
     computeFeatureStats(featureTracks: FeatureTracks): Partial<Sound> {
         return Object.keys(featureTracks).reduce((result, feature) => {
-            const featureTrack = featureTracks[feature];
+            const featureTrack = featureTracks[feature].map((item) => (Array.isArray(item) || !isNaN(item) ? item : 0));
             const t = tf.tensor(featureTrack);
+            // compute stats
             const stats = tf.moments(t, [0]);
             const mean = stats.mean.dataSync();
             const variance = stats.mean.dataSync();
@@ -130,13 +131,6 @@ export default class FeatureExtractor {
                     mean: mean[0],
                     variance: variance[0],
                 };
-
-                if (data.mean == null || data.variance == null) {
-                    console.log('NULL ----');
-                    console.log('featureTrack', featureTrack);
-                    console.log('mean', mean);
-                    console.log('variance', variance);
-                }
             }
 
             return { ...result, [feature]: data };
