@@ -30,9 +30,8 @@ There will also need to be a directory for python data collection and training.
         -   determine if melodic or one hit
     -   rhythm
 -   Interface
-    -   keep track of progress during analyzation
     -   reanalyze button and functionality
-    -   analyzation improvements
+    -   analyzation improvements (use a React reducer to manage UI state)
         -   show progress bar at bottom (maybe show most recently analyzed song in batch)
         -   show pop up after analyzation with any failed songs
     -   design improvments (icons, colors)
@@ -42,6 +41,3 @@ There will also need to be a directory for python data collection and training.
     -   drag samples from the list into a DAW or elsewhere
     -   other views/visualizations?
         -   2D view of instrument samples using t-SNE
--   Application
-    -   validate sound documents on insert
-        -   overwrite documents with same filename

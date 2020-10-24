@@ -86,7 +86,6 @@ export default class FeatureExtractor {
             const frame = new Float32Array(this.frameSize).fill(0);
             frame.set(buffer.slice(offset, end));
 
-            // TODO double check meyda applys a window internally
             const features = meyda.extract(FEATURES, frame, prevFrame);
             prevFrame = frame;
 
