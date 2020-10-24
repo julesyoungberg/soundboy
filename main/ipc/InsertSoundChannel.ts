@@ -1,17 +1,17 @@
 import { IpcMainEvent } from 'electron';
 
-import { IPCRequest, IPCResponse } from '../../@types';
+import { IpcRequest, IpcResponse } from '../../@types';
 import db from '../db';
 
 import Channel from './Channel';
 
-export default class AnalyzerChannel extends Channel {
+export default class InsertSoundChannel extends Channel {
     /**
      * Receives sound analysis data and inserts into the DB
      * @param event
      * @param request
      */
-    async handler(event: IpcMainEvent, request: IPCRequest) {
+    async handler(event: IpcMainEvent, request: IpcRequest) {
         const responseChannel = this.getResponseChannel(request);
         const data = request.params?.[0];
         if (!data) {
@@ -19,7 +19,7 @@ export default class AnalyzerChannel extends Channel {
             return;
         }
 
-        let reply: IPCResponse = {};
+        let reply: IpcResponse = {};
 
         try {
             await db.sounds.insert(JSON.parse(data));

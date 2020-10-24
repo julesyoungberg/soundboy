@@ -2,9 +2,7 @@ import React from 'react';
 import { IpcRenderer } from 'electron';
 import Stream from 'stream';
 
-import { IPCRequest, IPCResponse } from '../../@types';
-
-import { analyzeSounds } from './analyzer';
+import { IpcRequest, IpcResponse } from '../../@types';
 
 export default class IpcService {
     private ipcRenderer?: IpcRenderer;
@@ -24,7 +22,7 @@ export default class IpcService {
      * @param channel
      * @param request
      */
-    send(channel: string, request: IPCRequest = {}) {
+    send(channel: string, request: IpcRequest = {}) {
         console.log('sending to', channel);
         // If the ipcRenderer is not available try to initialize it
         if (!this.ipcRenderer) {
@@ -43,7 +41,7 @@ export default class IpcService {
      * @param channel
      * @param request
      */
-    fetch(channel: string, request: IPCRequest = {}): Promise<IPCResponse> {
+    fetch(channel: string, request: IpcRequest = {}): Promise<IpcResponse> {
         this.send(channel, request);
         return new Promise((resolve) => {
             this.ipcRenderer.once(request.responseChannel, (_event, response) => resolve(JSON.parse(response)));
@@ -56,7 +54,7 @@ export default class IpcService {
      * @param request
      * @param callback
      */
-    getStream(channel: string, request: IPCRequest): Stream.Readable {
+    getStream(channel: string, request: IpcRequest): Stream.Readable {
         const stream = new Stream.Readable();
         this.send(channel, request);
         // listen until a response with done==true is received
@@ -76,25 +74,18 @@ export default class IpcService {
         await this.fetch('clear_sounds', {});
     }
 
-    async analyze(folder: string, callback?: (data: IPCResponse) => void) {
-        await analyzeSounds(folder, async (data: IPCResponse) => {
+    async analyze(folder: string, callback?: (data: IpcResponse) => void) {
+        const resultsStream = this.getStream('analyze_sounds', { params: [folder] });
+        let data: IpcResponse | undefined
+        for await (data of resultsStream) {
             if (data.error) {
                 console.error(`Error analyzing '${data.result?.filename}'`);
                 console.error(data.error);
-                callback?.(data);
-                return;
+            } else {
+                console.log(`Analyzed ${data.result?.filename}`);
             }
-
-            if (!data.result) {
-                return;
-            }
-
-            const result = await this.fetch('insert_sound', {
-                params: [JSON.stringify(data.result)],
-            });
-            console.log(result);
-            callback?.({ ...data, ...result });
-        });
+            callback?.(data);
+        }
     }
 
     async getSounds(query: Record<string, any>) {

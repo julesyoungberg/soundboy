@@ -10,6 +10,7 @@ Make sure node and npm are up to date, then it's simple as
 git clone git@github.com:julesyoungberg/soundboy.git
 cd soundboy
 npm i
+npm run build:worker
 npm run dev
 ```
 
@@ -43,7 +44,7 @@ There will also need to be a directory for python data collection and training.
         -   E.g. filtering by `bright` may only return samples with a high enough spectral centroid
     -   drag samples from the list into a DAW or elsewhere
     -   other views/visualizations?
-        - 2D view of instrument samples using t-SNE
+        -   2D view of instrument samples using t-SNE
 -   Application
     -   validate sound documents on insert
         -   overwrite documents with same filename

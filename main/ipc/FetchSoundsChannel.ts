@@ -1,6 +1,6 @@
 import { IpcMainEvent } from 'electron';
 
-import { IPCRequest, IPCResponse } from '../../@types';
+import { IpcRequest, IpcResponse } from '../../@types';
 import db from '../db';
 
 import Channel from './Channel';
@@ -11,7 +11,7 @@ export default class FetchSoundsChannel extends Channel {
      * @param event
      * @param request { responseChannel, params: [DB query object] }
      */
-    async handler(event: IpcMainEvent, request: IPCRequest) {
+    async handler(event: IpcMainEvent, request: IpcRequest) {
         console.log('FetchSoundsChannel request: ', request.params);
         const responseChannel = this.getResponseChannel(request);
         const query = request.params?.[0];
@@ -20,7 +20,7 @@ export default class FetchSoundsChannel extends Channel {
             return;
         }
 
-        let reply: IPCResponse = {};
+        let reply: IpcResponse = {};
 
         try {
             const results = await db.sounds.fetch(JSON.parse(query));

@@ -14,16 +14,16 @@ const Sample = ({ sound }: { sound: Sound }) => {
             </Text>
             <Box my={3}>
                 <Text my={2} color='secondary' fontSize={[1, 2]}>
-                    Loudness: {sound.loudness.mean.toFixed(2)}
+                    Loudness: {sound.loudness.mean?.toFixed(2)}
                 </Text>
                 <Text my={2} color='secondary' fontSize={[1, 2]}>
-                    Centroid: {sound.spectralCentroid.mean.toFixed(2)}
+                    Centroid: {sound.spectralCentroid.mean?.toFixed(2)}
                 </Text>
                 <Text my={2} color='secondary' fontSize={[1, 2]}>
-                    Flatness: {sound.spectralFlatness.mean.toFixed(4)}
+                    Flatness: {sound.spectralFlatness.mean?.toFixed(4)}
                 </Text>
                 <Text my={2} color='secondary' fontSize={[1, 2]}>
-                    Kurtosis: {sound.spectralKurtosis.mean.toFixed(2)}
+                    Kurtosis: {sound.spectralKurtosis.mean?.toFixed(2)}
                 </Text>
             </Box>
             <audio controls>

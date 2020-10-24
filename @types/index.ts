@@ -28,14 +28,20 @@ export interface Sound {
     spectralKurtosis?: Feature;
 }
 
-export interface IPCRequest {
+export interface IpcRequest {
     responseChannel?: string;
     params?: string[];
 }
 
-export interface IPCResponse {
+export interface IpcResponse {
     done?: boolean;
     error?: string;
     result?: Sound;
     results?: Sound[];
+}
+
+export interface AnalyzerMessage {
+    error?: string;
+    sound?: Sound;
+    workerID: number;
 }
