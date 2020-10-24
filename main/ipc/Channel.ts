@@ -1,11 +1,13 @@
 import { IpcMainEvent } from 'electron';
 
+import { IpcRequest } from '../../@types';
+
 export default abstract class Channel {
     constructor(readonly name: string) {}
 
-    getResponseChannel(request: IPCRequest) {
-        return request.responseChannel || `${this.name}_response`;
+    getResponseChannel() {
+        return `${this.name}_response`;
     }
 
-    abstract async handler(event: IpcMainEvent, request: IPCRequest): Promise<void>;
+    abstract async handler(event: IpcMainEvent, request: IpcRequest): Promise<void>;
 }

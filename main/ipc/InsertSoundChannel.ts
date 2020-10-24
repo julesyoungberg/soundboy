@@ -1,31 +1,32 @@
 import { IpcMainEvent } from 'electron';
 
-import Channel from './Channel';
+import { IpcRequest, IpcResponse } from '../../@types';
 import db from '../db';
 
-export default class AnalyzerChannel extends Channel {
+import Channel from './Channel';
+
+export default class InsertSoundChannel extends Channel {
     /**
      * Receives sound analysis data and inserts into the DB
      * @param event
      * @param request
      */
-    async handler(event: IpcMainEvent, request: IPCRequest) {
-        console.log('InsertChannel request: ', request.params);
-        const responseChannel = this.getResponseChannel(request);
+    async handler(event: IpcMainEvent, request: IpcRequest) {
+        const responseChannel = this.getResponseChannel();
         const data = request.params?.[0];
         if (!data) {
             // TODO: error message
             return;
         }
 
-        let reply: IPCResponse = {};
+        let reply: IpcResponse = {};
 
         try {
-            await db.sounds.insert(JSON.parse(data));
+            await db.sounds.insert(data);
         } catch (error) {
             reply = { error };
         }
 
-        event.sender.send(responseChannel, JSON.stringify(reply));
+        event.sender.send(responseChannel, reply);
     }
 }

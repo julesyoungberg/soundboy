@@ -1,5 +1,7 @@
 import React from 'react';
 import { Box, Text } from 'rebass';
+
+import { Sound } from '../../@types';
 import getFileName from '../../util/getFileName';
 
 const Sample = ({ sound }: { sound: Sound }) => {
@@ -12,16 +14,16 @@ const Sample = ({ sound }: { sound: Sound }) => {
             </Text>
             <Box my={3}>
                 <Text my={2} color='secondary' fontSize={[1, 2]}>
-                    Loudness: {sound.loudness.total.toFixed(2)}
+                    Loudness: {sound.loudness.mean?.toFixed(2)}
                 </Text>
                 <Text my={2} color='secondary' fontSize={[1, 2]}>
-                    Centroid: {sound.spectralCentroid.toFixed(2)}
+                    Centroid: {sound.spectralCentroid.mean?.toFixed(2)}
                 </Text>
                 <Text my={2} color='secondary' fontSize={[1, 2]}>
-                    Flatness: {sound.spectralFlatness.toFixed(4)}
+                    Flatness: {sound.spectralFlatness.mean?.toFixed(4)}
                 </Text>
                 <Text my={2} color='secondary' fontSize={[1, 2]}>
-                    Kurtosis: {sound.spectralKurtosis.toFixed(2)}
+                    Kurtosis: {sound.spectralKurtosis.mean?.toFixed(2)}
                 </Text>
             </Box>
             <audio controls>

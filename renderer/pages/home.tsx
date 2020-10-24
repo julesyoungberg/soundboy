@@ -1,44 +1,45 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import Head from 'next/head';
-import { Button, Heading, Text } from 'rebass';
+import { Button, Heading } from 'rebass';
 
+import AnalyzerProgress from '../components/analyzer-progress';
 import SelectFolder from '../components/select-folder';
 import Samples from '../components/samples';
+import useAppState from '../hooks/useAppState';
 import useIpcService from '../hooks/useIpcService';
 
 export default function Home() {
+    const { dispatch, state } = useAppState();
     const ipcService = useIpcService();
-    const [folder, setFolder] = useState();
-    const [sounds, setSounds] = useState<Sound[]>([]);
-    useEffect(() => {
+
+    const analyze = async (folder) => {
         if (!ipcService) return;
-        reloadSounds();
+        await ipcService.analyze(folder, dispatch);
+    };
+
+    const getSounds = useCallback(async () => {
+        if (!ipcService) return [];
+        await ipcService.getSounds({}, dispatch);
     }, [ipcService]);
+
     const clear = async () => {
         if (!ipcService) return;
         await ipcService.clearSounds();
-        reloadSounds();
+        getSounds();
     };
-    const analyze = async (folder) => {
+
+    useEffect(() => {
         if (!ipcService) return;
-        console.log('analyze');
-        await ipcService.analyze(folder);
-    };
-    const getSounds = async () => {
-        if (!ipcService) return;
-        console.log('getSounds');
-        const { results } = await ipcService.getSounds({});
-        console.log(results);
-        return results;
-    };
-    const reloadSounds = useCallback(async () => {
-        const sounds = await getSounds();
-        setSounds(sounds);
-    }, [setSounds, getSounds]);
+        getSounds();
+    }, [ipcService, getSounds]);
+
     const onSelect = async (path) => {
         await analyze(path);
-        reloadSounds();
+        getSounds();
     };
+
+    console.log(state.sounds.data);
+
     return (
         <>
             <Head>
@@ -48,13 +49,14 @@ export default function Home() {
                 <Heading fontSize={[6, 7, 8]} color='primary' fontWeight='800'>
                     Soundboy
                 </Heading>
-                {sounds.length > 0 && (
+                {state.sounds.data.length > 0 && (
                     <Button onClick={clear} variant='primary' mr={2}>
                         Clear Sounds
                     </Button>
                 )}
                 <SelectFolder onChange={onSelect} />
-                <Samples sounds={sounds} />
+                <AnalyzerProgress />
+                <Samples sounds={state.sounds.data} />
             </div>
         </>
     );

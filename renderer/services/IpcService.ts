@@ -1,8 +1,10 @@
 import React from 'react';
 import { IpcRenderer } from 'electron';
-import Stream from 'stream';
 
-import { analyzeSounds } from './analyzer';
+import { IpcRequest, IpcResponse } from '../../@types';
+import getSoundFiles from './getSoundFiles';
+
+import Action from '../state/action';
 
 export default class IpcService {
     private ipcRenderer?: IpcRenderer;
@@ -22,15 +24,11 @@ export default class IpcService {
      * @param channel
      * @param request
      */
-    send(channel: string, request: IPCRequest = {}) {
+    send(channel: string, request: IpcRequest = {}) {
         console.log('sending to', channel);
         // If the ipcRenderer is not available try to initialize it
         if (!this.ipcRenderer) {
             this.initializeIpcRenderer();
-        }
-        // If there's no responseChannel let's auto-generate it
-        if (!request.responseChannel) {
-            request.responseChannel = `${channel}_response_${new Date().getTime()}`;
         }
 
         this.ipcRenderer.send(channel, request);
@@ -41,64 +39,58 @@ export default class IpcService {
      * @param channel
      * @param request
      */
-    fetch(channel: string, request: IPCRequest = {}): Promise<IPCResponse> {
+    fetch(channel: string, request: IpcRequest = {}): Promise<IpcResponse> {
         this.send(channel, request);
         return new Promise((resolve) => {
-            this.ipcRenderer.once(request.responseChannel, (_event, response) => resolve(JSON.parse(response)));
+            this.ipcRenderer.once(`${channel}_response`, (_event, response) => resolve(response));
         });
     }
 
     /**
-     * generator function that yields all IPC responses to request
+     * make a request to a channel and expect a streamed response
      * @param channel
      * @param request
      * @param callback
      */
-    getStream(channel: string, request: IPCRequest): Stream.Readable {
-        const stream = new Stream.Readable();
+    getStream(channel: string, request: IpcRequest, callback?: (data: IpcResponse) => void) {
         this.send(channel, request);
         // listen until a response with done==true is received
-        const responseListener = (_event: any, res: string) => {
-            const response = JSON.parse(res);
+        const responseListener = (_event: any, response: IpcResponse) => {
+            console.log('Received result', response);
             if (response.done) {
-                this.ipcRenderer.removeListener(request.responseChannel, responseListener);
+                this.ipcRenderer.removeListener(`${channel}_response`, responseListener);
             }
-            stream.push(response);
+            callback?.(response);
         };
 
-        this.ipcRenderer.on(request.responseChannel, responseListener);
-        return stream;
+        this.ipcRenderer.on(`${channel}_response`, responseListener);
     }
 
     async clearSounds() {
         await this.fetch('clear_sounds', {});
     }
 
-    async analyze(folder: string, callback?: (data: IPCResponse) => void) {
-        await analyzeSounds(folder, async (data: IPCResponse) => {
+    async analyze(folder: string, dispatch: (a: Action) => void) {
+        const soundfiles = await getSoundFiles(folder);
+        dispatch({ type: 'analyzer_start', payload: { soundfiles } });
+
+        this.getStream('analyze_sounds', { params: [folder] }, (data: IpcResponse) => {
             if (data.error) {
                 console.error(`Error analyzing '${data.result?.filename}'`);
                 console.error(data.error);
-                callback?.(data);
-                return;
+            } else {
+                console.log(`Analyzed ${data.result?.filename}`);
             }
-
-            if (!data.result) {
-                return;
-            }
-
-            const result = await this.fetch('insert_sound', {
-                params: [JSON.stringify(data.result)],
-            });
-            console.log(result);
-            callback?.({ ...data, ...result });
+            dispatch({ type: 'analyzer_update', payload: data });
         });
     }
 
-    async getSounds(query: Record<string, any>) {
+    async getSounds(query: Record<string, any>, dispatch: (a: Action) => void) {
+        dispatch({ type: 'fetch_sounds_request' });
         const result = await this.fetch('fetch_sounds', {
-            params: [JSON.stringify(query)],
+            params: [query],
         });
+        dispatch({ type: 'fetch_sounds_response', payload: result });
         return result;
     }
 }

@@ -4,6 +4,8 @@ import serve from 'electron-serve';
 import createWindow from './create-window';
 import { registerIpcChannels } from './ipc';
 
+app.allowRendererProcessReuse = true;
+
 const isProd: boolean = process.env.NODE_ENV === 'production';
 
 if (isProd) {
@@ -37,6 +39,7 @@ app.on('window-all-closed', () => {
 
 app.on('ready', async () => {
     const protocolName = 'audio';
+    // eslint-disable-next-line
     protocol.registerFileProtocol(protocolName, (request, callback) => {
         const url = request.url.replace(`${protocolName}://`, '');
         try {

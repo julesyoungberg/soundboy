@@ -10,6 +10,7 @@ Make sure node and npm are up to date, then it's simple as
 git clone git@github.com:julesyoungberg/soundboy.git
 cd soundboy
 npm i
+npm run build:worker
 npm run dev
 ```
 
@@ -25,25 +26,18 @@ There will also need to be a directory for python data collection and training.
     -   train an ML model for instrument classification, preferably we can find a pretrained model to adjust with our own samples.
     -   load the model into the analyzer worker for sample library classication
 -   Feature Extraction
-    -   support mp3, aiff, flac
-    -   hop through sample manually or with Web Audio Offline Context for NodeJS
     -   segmentation
         -   determine if melodic or one hit
-    -   tagging
-        -   either aliases for queries (mainly frontend) or computed more intelligently at extraction time (maybe use ML here too? \shrug)
     -   rhythm
 -   Interface
     -   reanalyze button and functionality
     -   analyzation improvements
         -   show progress bar at bottom (maybe show most recently analyzed song in batch)
-        -   show pop up after analyzation with any failed songs
+        -   show pop up after analyzation with any failed sounds
     -   design improvments (icons, colors)
     -   filter samples by perceptual features
         -   use buttons to generate NeDB queries
         -   E.g. filtering by `bright` may only return samples with a high enough spectral centroid
     -   drag samples from the list into a DAW or elsewhere
     -   other views/visualizations?
-        - 2D view of instrument samples using t-SNE
--   Application
-    -   validate sound documents on insert
-        -   overwrite documents with same filename
+        -   2D view of instrument samples using t-SNE
