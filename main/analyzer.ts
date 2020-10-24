@@ -17,7 +17,7 @@ function createWorkerWindow() {
         },
     });
 
-    window.loadURL(`file://${path.resolve(__dirname, '../worker/public/index.html')}`);
+    window.loadURL(`file://${path.resolve(__dirname, '../worker/dist/index.html')}`);
     return window;
 }
 
