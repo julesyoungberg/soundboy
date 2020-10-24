@@ -31,9 +31,9 @@ There will also need to be a directory for python data collection and training.
     -   rhythm
 -   Interface
     -   reanalyze button and functionality
-    -   analyzation improvements (use a React reducer to manage UI state)
+    -   analyzation improvements
         -   show progress bar at bottom (maybe show most recently analyzed song in batch)
-        -   show pop up after analyzation with any failed songs
+        -   show pop up after analyzation with any failed sounds
     -   design improvments (icons, colors)
     -   filter samples by perceptual features
         -   use buttons to generate NeDB queries

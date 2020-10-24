@@ -2,6 +2,9 @@ import React from 'react';
 import { IpcRenderer } from 'electron';
 
 import { IpcRequest, IpcResponse } from '../../@types';
+import getSoundFiles from './getSoundFiles';
+
+import Action from '../state/action';
 
 export default class IpcService {
     private ipcRenderer?: IpcRenderer;
@@ -44,7 +47,7 @@ export default class IpcService {
     }
 
     /**
-     * generator function that yields all IPC responses to request
+     * make a request to a channel and expect a streamed response
      * @param channel
      * @param request
      * @param callback
@@ -67,7 +70,10 @@ export default class IpcService {
         await this.fetch('clear_sounds', {});
     }
 
-    async analyze(folder: string, callback?: (data: IpcResponse) => void) {
+    async analyze(folder: string, dispatch: (a: Action) => void) {
+        const soundfiles = await getSoundFiles(folder);
+        dispatch({ type: 'analyzer_start', payload: { soundfiles }});
+
         this.getStream('analyze_sounds', { params: [folder] }, (data: IpcResponse) => {
             if (data.error) {
                 console.error(`Error analyzing '${data.result?.filename}'`);
@@ -75,7 +81,7 @@ export default class IpcService {
             } else {
                 console.log(`Analyzed ${data.result?.filename}`);
             }
-            callback?.(data);
+            dispatch({ type: 'analyzer_update', payload: data });
         });
     }
 

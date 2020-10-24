@@ -2,7 +2,7 @@ import load from 'audio-loader';
 
 import { Sound } from '../@types';
 
-import FeatureExtractor from './feature-extractor';
+import FeatureExtractor from './FeatureExtractor';
 
 const extractor = new FeatureExtractor();
 

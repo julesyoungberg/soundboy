@@ -3,18 +3,21 @@ import Head from 'next/head';
 import { Button, Heading } from 'rebass';
 
 import { Sound } from '../../@types';
+import AnalyzerProgress from '../components/analyzer-progress';
 import SelectFolder from '../components/select-folder';
 import Samples from '../components/samples';
+import useAppState from '../hooks/useAppState';
 import useIpcService from '../hooks/useIpcService';
 
 export default function Home() {
+    const { dispatch } = useAppState();
     const ipcService = useIpcService();
     const [sounds, setSounds] = useState<Sound[]>([]);
 
     const analyze = async (folder) => {
         if (!ipcService) return;
         console.log('analyze');
-        await ipcService.analyze(folder);
+        await ipcService.analyze(folder, dispatch);
     };
 
     const getSounds = useCallback(async () => {
@@ -63,6 +66,7 @@ export default function Home() {
                     </Button>
                 )}
                 <SelectFolder onChange={onSelect} />
+                <AnalyzerProgress />
                 <Samples sounds={sounds} />
             </div>
         </>

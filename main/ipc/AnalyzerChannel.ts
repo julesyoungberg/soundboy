@@ -1,7 +1,7 @@
 import { IpcMainEvent } from 'electron';
 
 import { IpcRequest, IpcResponse } from '../../@types';
-import Analyzer from '../analyzer';
+import Analyzer from '../Analyzer';
 
 import Channel from './Channel';
 
