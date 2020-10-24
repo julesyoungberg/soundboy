@@ -4,7 +4,7 @@ import serve from 'electron-serve';
 import createWindow from './create-window';
 import { registerIpcChannels } from './ipc';
 
-app.allowRendererProcessReuse = true
+app.allowRendererProcessReuse = true;
 
 const isProd: boolean = process.env.NODE_ENV === 'production';
 

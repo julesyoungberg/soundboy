@@ -22,6 +22,7 @@
     "lines-between-class-members": "off",
     "max-len": ["error", { "code": 140, "ignoreUrls": true }],
     "no-console": "off",
+    "no-plusplus": "off",
     "no-underscore-dangle": "warn",
     "no-use-before-define": [0],
     "no-useless-constructor": "off",

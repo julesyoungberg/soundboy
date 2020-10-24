@@ -2,29 +2,13 @@ import load from 'audio-loader';
 
 import { Sound } from '../@types';
 
-import AnalyzerEngine from './analyzer-engine';
+import FeatureExtractor from './feature-extractor';
 
-const FEATURES = [
-    'chroma',
-    'loudness',
-    'mfcc',
-    'perceptualSharpness',
-    'perceptualSpread',
-    'spectralCentroid',
-    'spectralFlatness',
-    // 'spectralFlux',
-    'spectralSlope',
-    'spectralRolloff',
-    'spectralSpread',
-    'spectralSkewness',
-    'spectralKurtosis',
-];
-
-const engine = new AnalyzerEngine(FEATURES);
+const extractor = new FeatureExtractor();
 
 /**
  * convert a stereo signal to mono by averaging the two channels
- * @param buffer 
+ * @param buffer
  */
 export function toMono(buffer: AudioBuffer) {
     if (buffer.numberOfChannels === 1) {
@@ -42,12 +26,12 @@ export function toMono(buffer: AudioBuffer) {
 
 /**
  * extract basic features from a sound file
- * @param filename 
+ * @param filename
  */
 export async function getFeatures(filename: string): Promise<Sound> {
     console.log('extracting features from', filename);
     const buffer = toMono(await load(filename));
-    const features = engine.analyze(buffer);
+    const features = extractor.getFeatures(buffer);
     return { filename, ...features };
 }
 
@@ -59,6 +43,5 @@ export async function getFeatures(filename: string): Promise<Sound> {
 export default async function analyze(filename: string): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
     const result = await getFeatures(filename);
-    // TODO: classify instrument with ML
     return result;
 }

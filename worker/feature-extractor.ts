@@ -3,7 +3,23 @@ import meyda from 'meyda/dist/node/main';
 
 import { ArrayFeature, Feature, Sound } from '../@types';
 
-interface AnalyzerOptions {
+const FEATURES = [
+    'chroma',
+    'loudness',
+    'mfcc',
+    'perceptualSharpness',
+    'perceptualSpread',
+    'spectralCentroid',
+    'spectralFlatness',
+    // 'spectralFlux',
+    'spectralSlope',
+    'spectralRolloff',
+    'spectralSpread',
+    'spectralSkewness',
+    'spectralKurtosis',
+];
+
+interface FeatureExtractorOptions {
     frameSize?: number;
     hopSize?: number;
 }
@@ -41,15 +57,15 @@ const initialFeatureTracks = (): FeatureTracks => ({
 });
 
 /**
- * Analyzer engine class
+ * Feaure Extractor class
  * - allows configuration to be shared between sounds
  * - holds the core signal processes logic for Soundboy
  */
-export default class AnalyzerEngine {
+export default class FeatureExtractor {
     frameSize = 2048;
     hopSize = 512;
 
-    constructor(readonly features: string[], config: AnalyzerOptions = {}) {
+    constructor(config: FeatureExtractorOptions = {}) {
         this.frameSize = config.frameSize || 2048;
         this.hopSize = config.hopSize || 512;
     }
@@ -71,11 +87,11 @@ export default class AnalyzerEngine {
             frame.set(buffer.slice(offset, end));
 
             // TODO double check meyda applys a window internally
-            const features = meyda.extract(this.features, frame, prevFrame);
+            const features = meyda.extract(FEATURES, frame, prevFrame);
             prevFrame = frame;
 
             // push features to appropriate tracks
-            this.features.forEach((feature) => {
+            FEATURES.forEach((feature) => {
                 const val = features[feature];
 
                 if (feature === 'loudness') {
@@ -124,7 +140,7 @@ export default class AnalyzerEngine {
      * Main algorithm that takes a signal buffer and returns feature stats
      * @param buffer
      */
-    analyze(buffer: Float32Array): Partial<Sound> {
+    getFeatures(buffer: Float32Array): Partial<Sound> {
         const featureTracks = this.getFeatureTracks(buffer);
         return this.computeFeatureStats(featureTracks);
     }

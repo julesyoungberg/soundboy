@@ -7,7 +7,7 @@ module.exports = [
         entry: './index.ts',
         target: 'electron-renderer',
         devtool: 'source-map',
-        module: { 
+        module: {
             rules: [
                 {
                     test: /\.ts$/,
@@ -17,14 +17,12 @@ module.exports = [
             ],
         },
         resolve: {
-            extensions: [ '.ts', '.js' ],
+            extensions: ['.ts', '.js'],
         },
         output: {
             filename: 'bundle.js',
             path: path.resolve(__dirname, 'public'),
         },
-        plugins: [
-            new HtmlWebpackPlugin(),
-        ],
+        plugins: [new HtmlWebpackPlugin()],
     },
 ];

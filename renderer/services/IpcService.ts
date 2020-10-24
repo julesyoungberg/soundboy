@@ -76,7 +76,8 @@ export default class IpcService {
 
     async analyze(folder: string, callback?: (data: IpcResponse) => void) {
         const resultsStream = this.getStream('analyze_sounds', { params: [folder] });
-        let data: IpcResponse | undefined
+        let data: IpcResponse | undefined;
+        // eslint-disable-next-line
         for await (data of resultsStream) {
             if (data.error) {
                 console.error(`Error analyzing '${data.result?.filename}'`);

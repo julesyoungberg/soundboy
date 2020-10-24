@@ -6,7 +6,7 @@ import Analyzer from '../analyzer';
 import Channel from './Channel';
 
 export default class AnalyzerChannel extends Channel {
-    analyzer: Analyzer | undefined
+    analyzer: Analyzer | undefined;
 
     constructor(readonly name: string) {
         super(name);
@@ -23,7 +23,7 @@ export default class AnalyzerChannel extends Channel {
         console.log('AnalyzerChannel request: ', request.params);
         const responseChannel = this.getResponseChannel(request);
 
-        const folder = request.params?.[0]
+        const folder = request.params?.[0];
         if (!folder) {
             // TODO: error message
             return;

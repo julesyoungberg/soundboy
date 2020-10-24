@@ -2,16 +2,16 @@ import { BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import path from 'path';
 import os from 'os';
 
-import { AnalyzerMessage, IpcRequest, IpcResponse, Sound } from '../@types';
+import { AnalyzerMessage, IpcResponse } from '../@types';
 import { TASKS_CHANNEL, RESULTS_CHANNEL } from '../constants';
 import getSoundFiles from '../util/getSoundFiles';
 import db from './db';
 
-const cpus = os.cpus().length;
+const NUM_WORKERS = Math.ceil(os.cpus().length / 2);
 
 function createWorkerWindow() {
     const window = new BrowserWindow({
-        // show: false,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
         },
@@ -24,7 +24,7 @@ function createWorkerWindow() {
 /**
  * Main Thread Analyzer Logic
  * meant to persistently exist in the main thread,
- * spawns workers for tasks as they come in, 
+ * spawns workers for tasks as they come in,
  * cleans up afterwards.
  */
 export default class Analyzer {
@@ -42,7 +42,7 @@ export default class Analyzer {
      * Initialize analyzation process
      * @param folder
      */
-    async analyze(folder: string, callbak: (reply: IpcResponse) => void) {
+    async analyze(folder: string, callback: (reply: IpcResponse) => void) {
         if (this.workers.length > 0) {
             this.callback({ done: true, error: 'Analyzation already in progress' });
             return;
@@ -51,17 +51,16 @@ export default class Analyzer {
         console.log('fetching sound files');
         this.tasks = await getSoundFiles(folder);
         const numTasks = this.tasks.length;
-        this.callback = callbak;
-        
+        this.callback = callback;
+
         ipcMain.on(RESULTS_CHANNEL, this.resultHandler);
 
         console.log('spawning workers');
         // spawn workers and assign tasks
-        for (let i = 0; i < Math.min(numTasks, cpus); i++) {
+        for (let i = 0; i < Math.min(numTasks, NUM_WORKERS); i++) {
             const worker = createWorkerWindow();
             this.workers.push(worker);
-            const j = i;
-            worker.webContents.on('dom-ready', () => this.assignTaskTo(j))
+            worker.webContents.on('dom-ready', () => this.assignTaskTo(i));
         }
     }
 
@@ -69,12 +68,12 @@ export default class Analyzer {
      * IPC handler for analyzer results.
      * handle the data appropriately, (save and/or forward),
      * then either assign next task or finish up
-     * @param event 
-     * @param request 
+     * @param event
+     * @param request
      */
     async resultHandler(event: IpcMainEvent, data: string) {
         console.log(`resultHandler()`);
-        let result: AnalyzerMessage | undefined
+        let result: AnalyzerMessage | undefined;
 
         try {
             result = JSON.parse(data);
@@ -83,7 +82,9 @@ export default class Analyzer {
                 console.log('MISSING WORKER ID');
                 // this is a message from an unknown worker
                 return;
-            } else if (result.error) {
+            }
+
+            if (result.error) {
                 console.error(result.error);
                 this.callback({ error: result.error, result: result.sound });
             } else {
@@ -93,7 +94,7 @@ export default class Analyzer {
                 this.callback({ result: result.sound });
             }
         } catch (error) {
-            this.callback({ error })
+            this.callback({ error });
         }
 
         // assign next task

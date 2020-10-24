@@ -5,13 +5,18 @@ import { TASKS_CHANNEL, RESULTS_CHANNEL } from '../constants';
 
 import analyze from './analyze';
 
-const ipcRenderer = require('electron').ipcRenderer;
+const electron = window.require('electron');
+const { ipcRenderer } = electron;
 
 console.log(`Listening for tasks on channel: ${TASKS_CHANNEL}`);
 
-ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, raw: string) => {
+/**
+ * Main worker logic
+ * given a filename, load it, analyze it, return the results
+ */
+ipcRenderer.on(TASKS_CHANNEL, async (_event: IpcRendererEvent, raw: string) => {
     console.log('Received task', raw);
-    let data: AnalyzerMessage | undefined
+    let data: AnalyzerMessage | undefined;
     try {
         data = JSON.parse(raw);
     } catch (error) {
@@ -29,7 +34,7 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, raw: string) => {
         };
         console.log('responding with:', response);
         ipcRenderer.send(RESULTS_CHANNEL, JSON.stringify(response));
-    }
+    };
 
     if (!data.sound.filename) {
         reply({ error: 'Missing filename' });
@@ -44,6 +49,5 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, raw: string) => {
     } catch (error) {
         console.error(error);
         reply({ error });
-        return;
     }
 });
