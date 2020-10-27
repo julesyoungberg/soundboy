@@ -20,8 +20,10 @@
     "electron-serve": "^1.0.0",
     "electron-store": "^6.0.1",
     "nedb-promises": "^4.1.0",
+    "react-icons": "^3.11.0",
     "threads": "^1.6.3",
-    "ts-node": "^9.0.0"
+    "ts-node": "^9.0.0",
+    "wavesurfer.js": "^4.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",

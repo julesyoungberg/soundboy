@@ -37,6 +37,10 @@ app.on('window-all-closed', () => {
     app.quit();
 });
 
+protocol.registerSchemesAsPrivileged([
+    { scheme: 'audio', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: false } },
+]);
+
 app.on('ready', async () => {
     const protocolName = 'audio';
     // eslint-disable-next-line

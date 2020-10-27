@@ -1,3 +1,7 @@
+import { UrlObject } from 'url';
+
+export type Url = string | UrlObject;
+
 export interface Feature {
     mean: number;
     variance: number;

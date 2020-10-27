@@ -15,7 +15,9 @@ const ErrorMessage = styled.small`
 `;
 
 export default function AnalyzerProgress() {
-    const { state: { analyzer } } = useAppState();
+    const {
+        state: { analyzer },
+    } = useAppState();
     const theme = useTheme();
 
     if (analyzer.tasks.length === 0) {

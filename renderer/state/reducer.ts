@@ -6,8 +6,8 @@ import { State } from '.';
 
 /**
  * An analyzation has been initiated
- * @param state 
- * @param action 
+ * @param state
+ * @param action
  */
 function startAnalyzer(state: State, action: Action): State {
     return {
@@ -23,8 +23,8 @@ function startAnalyzer(state: State, action: Action): State {
 
 /**
  * Data from the analyzer has been received
- * @param state 
- * @param action 
+ * @param state
+ * @param action
  */
 function updateAnalyzer(state: State, action: Action): State {
     const errors = [...state.analyzer.errors];
@@ -46,8 +46,8 @@ function updateAnalyzer(state: State, action: Action): State {
 
 /**
  * A fetch sounds request has been initiated
- * @param state 
- * @param action 
+ * @param state
+ * @param action
  */
 function fetchSoundsRequest(state: State, _action: Action): State {
     return {
@@ -62,8 +62,8 @@ function fetchSoundsRequest(state: State, _action: Action): State {
 
 /**
  * A response from the DB has been received
- * @param state 
- * @param action 
+ * @param state
+ * @param action
  */
 function fetchSoundsResponse(state: State, action: Action): State {
     return {
@@ -71,15 +71,15 @@ function fetchSoundsResponse(state: State, action: Action): State {
         sounds: {
             data: action.payload.results,
             error: action.payload.error,
-            fetching: false,    
+            fetching: false,
         },
     };
 }
 
 /**
  * Main top-level application reducer
- * @param state 
- * @param action 
+ * @param state
+ * @param action
  */
 export default function reducer(state: State, action: Action): State {
     switch (action.type) {
