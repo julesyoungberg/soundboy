@@ -6,6 +6,8 @@ from tinydb import TinyDB, Query
 import urllib3
 import xlsxwriter
 
+from pydub import AudioSegment
+
 import os
 
 # create list of instaments
@@ -27,24 +29,36 @@ def make_soup(url):
     return BeautifulSoup(r.data,'lxml')
 
 
+def convert_to_wav(file):
+	sound = AudioSegment.from_mp3(src)
+	sound.export(dst, format="wav")
+
+
 def get_sounds(instament):
 	# set to 5 so my computer can store everything and for testing
-	count = 5
-	curr = 0
 	# change the query to modify the scearch
-	results = client.text_search(query= instament,fields="id,name,previews")
+	results = client.text_search(query= instament ,fields="id,name,previews")
 
-	for sound in results:
-		if curr == count:
-			break
+	print("Num results:", results.count)
+	while results != None:
 
-		sound.retrieve_preview(".",sound.name+".mp3")
-		print(sound.name)
-		curr += 1 
+		for sound in results:
+
+			sound.retrieve_preview(".",sound.name)
+			filename = sound.name.split('.')[0] + '.wav'
+			print(filename)
+			# #renaming them to avoid the double .wav.wav
+			os.rename(str(home_path) + str('/instaments/') + str(instament) + str('/') + str(sound.name), str(home_path) + str('/instaments/') + str(instament) + str('/') + str(filename) )
+
+		try:
+			print("next page")
+			results = results.next_page()
+		except:
+			print("no more pages")
+			results = None
 
 	#print("Done " + str(instament))
 	curr = 0
-
 
 
 def get_list():
@@ -87,7 +101,7 @@ def create_dir(list, home_path):
 	# alows creation of new value
 	mode = 0o777
 	try:  
-		os.mkdir(home_path, mode) 
+		os.mkdir(home_path + str('/instaments/'), mode) 
 	except OSError as error:  
 		print(error)  
 
@@ -101,22 +115,23 @@ def create_dir(list, home_path):
 		print(i)
 
 		try:  
-			os.mkdir("/Users/jonathankelly/Desktop/csc_475/project/instaments/" + str(i), mode)
-			os.chdir("/Users/jonathankelly/Desktop/csc_475/project/instaments/" + str(i))
+			os.mkdir(str(home_path) + str('/instaments/') + str(i), mode)
+			os.chdir(str(home_path) + str('/instaments/') + str(i))
 			
 			# off for testing on the ferry
 			get_sounds(i)
-			os.chdir("/Users/jonathankelly/Desktop/csc_475/project/instaments/")
+			os.chdir(str(home_path))
 		except OSError as error:  
 			print(error)  
 
 
-
-home_path = "/Users/jonathankelly/Desktop/csc_475/project/instaments"
+# set to your own path
+home_path = os.path.dirname(os.path.abspath(__file__))
 
 #function calling
-in_list = get_list()
-create_dir(in_list, home_path)
+#in_list = get_list()
+tmp_list = [ 'Kick', 'Kicks', 'KICK', 'Snare', 'Cymbal', 'Cymbals', 'Bass', 'Guitar', 'Guitars', 'Horns', 'Keys', 'Strings' ]
+create_dir(tmp_list, home_path)
 
 
 
