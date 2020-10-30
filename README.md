@@ -40,6 +40,12 @@ There will also need to be a directory for python data collection and training.
     -   other views/visualizations?
         -   2D view of instrument samples using t-SNE
 -   ML
+    -   More Feature Exrtraction:
+        -   Explore timbre space: all examples seem to centre around the centroid + 2 other features
+            -   centroid, roughness, log attack time
+            -   centroid, flux, etc....
+        -   Librosa's other features: means + std devs
+            -   centroid, bandwidth, contrasts, flatness, rolloff, zcf
     -   Explore Keras builtins: VGG19 + VGGish feature extraction
     -   Standardization of data
     -   Principal Component Analysis
