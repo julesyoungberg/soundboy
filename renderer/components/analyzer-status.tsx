@@ -82,9 +82,7 @@ export default function AnalyzerStatus() {
             {analyzer.errors.length > 0 && (
                 <Errors>
                     {analyzer.errors.map((error) => (
-                        <>
-                            <ErrorMessage>{error.message}</ErrorMessage>
-                        </>
+                        <ErrorMessage key={error.message}>{error.message}</ErrorMessage>
                     ))}
                 </Errors>
             )}
