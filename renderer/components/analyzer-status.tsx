@@ -43,7 +43,10 @@ export default function AnalyzerStatus() {
     } = useAppState();
     const theme = useTheme();
 
-    if (!analyzer.running && analyzer.errors.length === 0) {
+    if (
+        analyzer.tasks.length === 0 ||
+        (!analyzer.running && analyzer.errors.length === 0)
+    ) {
         return null;
     }
 
