@@ -24,15 +24,22 @@ export function toMono(buffer: AudioBuffer) {
     throw new Error('unexpected number of channels');
 }
 
-/**
- * extract basic features from a sound file
- * @param filename
- */
-export async function getFeatures(filename: string): Promise<Sound> {
-    console.log('extracting features from', filename);
-    const buffer = toMono(await load(filename));
-    const features = extractor.getFeatures(buffer);
-    return { filename, ...features };
+async function loadSoundFile(filename: string): Promise<Float32Array> {
+    let buffer: AudioBuffer | undefined
+    try {
+        buffer = await load(filename);
+    } catch (e) {
+        throw new Error(`Error loading '${filename}': ${e}`);
+    }
+
+    let samples: Float32Array | undefined
+    try {
+        samples = toMono(buffer);
+    } catch (e) {
+        throw new Error(`Error converting '${filename}' to mono: ${e}`);
+    }
+
+    return samples;
 }
 
 /**
@@ -42,6 +49,8 @@ export async function getFeatures(filename: string): Promise<Sound> {
  */
 export default async function analyze(filename: string): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
-    const result = await getFeatures(filename);
-    return result;
+
+    const buffer = await loadSoundFile(filename);
+    
+    return extractor.getFeatures(buffer, filename);
 }

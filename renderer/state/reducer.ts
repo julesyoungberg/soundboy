@@ -2,7 +2,7 @@
  * This file descibes how the application state changes based on actions
  */
 import Action from './action';
-import { State } from '.';
+import { initialState, State } from '.';
 
 /**
  * An analyzation has been initiated
@@ -10,6 +10,10 @@ import { State } from '.';
  * @param action
  */
 function startAnalyzer(state: State, action: Action): State {
+    if (!action.payload?.soundfiles) {
+        return state;
+    }
+
     return {
         ...state,
         analyzer: {
@@ -27,18 +31,29 @@ function startAnalyzer(state: State, action: Action): State {
  * @param action
  */
 function updateAnalyzer(state: State, action: Action): State {
-    const errors = [...state.analyzer.errors];
-    if (action.payload.error) {
-        errors.push({ error: action.payload.error, filename: action.payload.result.filename });
+    if (!action.payload) {
+        return state;
+    }
+
+    const { done, error, result } = action.payload;
+    let errors = [...state.analyzer.errors];
+
+    if (error) {
+        errors = errors.filter((error) => !error.filename || (error.filename !== action.payload.result.filename));
+        errors.push({
+            message: error.message || error,
+            filename: action.payload.result?.filename,
+        });
     }
 
     return {
         ...state,
         analyzer: {
+            ...state.analyzer,
             completed: state.analyzer.completed + 1,
             errors,
-            latest: action.payload.result.filename,
-            running: !action.payload.done,
+            latest: result?.filename,
+            running: !done,
             tasks: state.analyzer.tasks,
         },
     };
@@ -66,6 +81,10 @@ function fetchSoundsRequest(state: State, _action: Action): State {
  * @param action
  */
 function fetchSoundsResponse(state: State, action: Action): State {
+    if (!action.payload) {
+        return state;
+    }
+
     return {
         ...state,
         sounds: {
@@ -81,12 +100,17 @@ function fetchSoundsResponse(state: State, action: Action): State {
  * @param state
  * @param action
  */
-export default function reducer(state: State, action: Action): State {
+export default function reducer(state: State = initialState, action: Action): State {
     switch (action.type) {
         case 'analyzer_start':
             return startAnalyzer(state, action);
         case 'analyzer_update':
             return updateAnalyzer(state, action);
+        case 'analyzer_dismiss':
+            return {
+                ...state,
+                analyzer: initialState.analyzer,
+            };
         case 'fetch_sounds_request':
             return fetchSoundsRequest(state, action);
         case 'fetch_sounds_response':

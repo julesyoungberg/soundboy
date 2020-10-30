@@ -10,6 +10,8 @@ const Card = ({
     children,
     onClick,
     href,
+    clickable = true,
+    className,
     ...rest
 }: {
     title?: string;
@@ -17,11 +19,16 @@ const Card = ({
     href?: Url;
     onClick?: () => void;
     children?: React.ReactNode;
+    clickable?: boolean;
+    className?: string;
 }) => {
-    const activeStyle = {
-        borderWidth: '3px',
-        borderColor: 'primary',
-    };
+    let activeStyle = {};
+    if (clickable) {
+        activeStyle = {
+            borderWidth: '3px',
+            borderColor: 'primary',
+        };
+    }
     const style = {
         borderRadius: '7px',
         borderWidth: '1px',
@@ -33,7 +40,7 @@ const Card = ({
         },
     };
     return (
-        <Clickable href={href} onClick={onClick}>
+        <Clickable href={href} onClick={onClick} className={className}>
             <Box p={3} mx={2} my={2} sx={active ? { ...style, ...activeStyle } : style} bg='white'>
                 {!!title && (
                     <Heading my={2} color='primary' fontWeight='bold' fontSize={[4, 3]}>

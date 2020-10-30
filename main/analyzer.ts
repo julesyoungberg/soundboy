@@ -90,25 +90,26 @@ export default class Analyzer {
                 this.callback({ result: result.sound });
             }
         } catch (error) {
+            console.error(error);
             this.callback({ error });
         }
 
         // assign next task
         if (this.tasks.length > 0) {
-            console.log(`Assigning task to ${result.workerID} over channel ${TASKS_CHANNEL}`);
+            console.log(`assigning task to ${result.workerID} over channel ${TASKS_CHANNEL}`);
             event.sender.send(TASKS_CHANNEL, this.taskAssignment(result.workerID));
         } else {
             // kill worker since there's no more work
             console.log('killing worker');
-            this.workers[result.workerID].close();
+            this.workers[result.workerID]?.close();
             this.workers[result.workerID] = undefined;
 
             // check if done
             if (this.workers.every((worker) => worker === undefined)) {
                 // this is the last worker, we're done here
-                this.callback({ done: true });
                 this.workers = [];
                 console.log('analyzer finished');
+                this.callback({ done: true });
             }
         }
     }

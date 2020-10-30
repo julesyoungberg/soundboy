@@ -56,7 +56,6 @@ export default class IpcService {
         this.send(channel, request);
         // listen until a response with done==true is received
         const responseListener = (_event: any, response: IpcResponse) => {
-            console.log('Received result', response);
             if (response.done) {
                 this.ipcRenderer.removeListener(`${channel}_response`, responseListener);
             }
@@ -75,12 +74,11 @@ export default class IpcService {
         dispatch({ type: 'analyzer_start', payload: { soundfiles } });
 
         this.getStream('analyze_sounds', { params: [folder] }, (data: IpcResponse) => {
+            console.log('received update: ', data);
             if (data.error) {
-                console.error(`Error analyzing '${data.result?.filename}'`);
                 console.error(data.error);
-            } else {
-                console.log(`Analyzed ${data.result?.filename}`);
             }
+
             dispatch({ type: 'analyzer_update', payload: data });
         });
     }
