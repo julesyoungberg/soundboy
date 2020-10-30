@@ -39,3 +39,10 @@ There will also need to be a directory for python data collection and training.
     -   drag samples from the list into a DAW or elsewhere
     -   other views/visualizations?
         -   2D view of instrument samples using t-SNE
+-   ML
+    -   Explore Keras builtins: VGG19 + VGGish feature extraction
+    -   Standardization of data
+    -   Principal Component Analysis
+    -   Other ML models to explore:
+        -   k-nearest neighbour
+        -   SVM (Support Vector Machine) and RBFNN (radial basis functions NNs)
