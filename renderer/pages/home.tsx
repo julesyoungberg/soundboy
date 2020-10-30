@@ -42,7 +42,7 @@ function Home({ group }: { group?: string }) {
             // just stopped, get sounds
             getSounds();
         }
-    }, [state.analyzer.running, getSounds])
+    }, [state.analyzer.running, getSounds]);
 
     const onSelect = async (path) => {
         await analyze(path);

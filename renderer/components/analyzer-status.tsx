@@ -33,7 +33,7 @@ const Errors = styled(Box)`
 const ErrorMessage = styled.div<{ color?: string }>`
     margin-top: 10px;
     width: 100%;
-    color: ${props => props.color};
+    color: ${(props) => props.color};
 `;
 
 export default function AnalyzerStatus() {
@@ -59,7 +59,7 @@ export default function AnalyzerStatus() {
                 <small>Analyzing... {analyzer.latest || ''}</small>
                 <Line percent={percent} strokeColor={theme.colors.secondary} />
             </ProgressContainer>
-        )
+        );
     } else {
         const dismiss = () => dispatch({ type: 'analyzer_dismiss' });
 
@@ -72,11 +72,11 @@ export default function AnalyzerStatus() {
                 </Box>
                 <Box>
                     <Clickable onClick={dismiss}>
-                        <GrClose/>
+                        <GrClose />
                     </Clickable>
                 </Box>
             </Flex>
-        )
+        );
     }
 
     return (

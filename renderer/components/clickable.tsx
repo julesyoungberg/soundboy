@@ -14,13 +14,21 @@ const Button = styled.button`
     font-family: ${(props: Theme) => props.theme.fonts.body};
 `;
 
-const Clickable = ({ children, href, onClick, className }: { children: React.ReactNode; href?: Url; onClick?: () => void, className?: string; }) => {
+const Clickable = ({
+    children,
+    href,
+    onClick,
+    className,
+}: {
+    children: React.ReactNode;
+    href?: Url;
+    onClick?: () => void;
+    className?: string;
+}) => {
     const isLink = typeof href !== 'undefined';
     const isButton = typeof onClick === 'function';
     if (!isLink && !isButton) {
-        return (
-            <div className={className}>{children}</div>
-        );
+        return <div className={className}>{children}</div>;
     }
     const Wrapper = isLink ? Link : Button;
     const props = isLink ? { href } : { onClick };

@@ -25,14 +25,14 @@ export function toMono(buffer: AudioBuffer) {
 }
 
 async function loadSoundFile(filename: string): Promise<Float32Array> {
-    let buffer: AudioBuffer | undefined
+    let buffer: AudioBuffer | undefined;
     try {
         buffer = await load(filename);
     } catch (e) {
         throw new Error(`Error loading '${filename}': ${e}`);
     }
 
-    let samples: Float32Array | undefined
+    let samples: Float32Array | undefined;
     try {
         samples = toMono(buffer);
     } catch (e) {
@@ -51,6 +51,6 @@ export default async function analyze(filename: string): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
 
     const buffer = await loadSoundFile(filename);
-    
+
     return extractor.getFeatures(buffer, filename);
 }

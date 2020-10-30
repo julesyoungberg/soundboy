@@ -39,7 +39,7 @@ function updateAnalyzer(state: State, action: Action): State {
     let errors = [...state.analyzer.errors];
 
     if (error) {
-        errors = errors.filter((error) => !error.filename || (error.filename !== action.payload.result.filename));
+        errors = errors.filter((error) => !error.filename || error.filename !== action.payload.result.filename);
         errors.push({
             message: error.message || error,
             filename: action.payload.result?.filename,
