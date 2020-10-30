@@ -28,6 +28,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         if (!ipcService) setIpcService(new IpcService());
     }, [ipcService]);
 
+    console.log(state);
+
     return (
         <ThemeProvider theme={theme}>
             <IpcContext.Provider value={ipcService}>

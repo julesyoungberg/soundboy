@@ -142,8 +142,22 @@ export default class FeatureExtractor {
      * Main algorithm that takes a signal buffer and returns feature stats
      * @param buffer
      */
-    getFeatures(buffer: Float32Array): Partial<Sound> {
-        const featureTracks = this.getFeatureTracks(buffer);
-        return this.computeFeatureStats(featureTracks);
+    getFeatures(buffer: Float32Array, filename: string): Sound {
+        let featureTracks: FeatureTracks = initialFeatureTracks();
+        try {
+            featureTracks = this.getFeatureTracks(buffer);
+        } catch (e) {
+            throw new Error(`Error extracting features from '${filename}': ${e}`);
+        }
+
+        let result: Sound = { filename };
+        try {
+            const features = this.computeFeatureStats(featureTracks);
+            result = { ...features, filename };
+        } catch (e) {
+            throw new Error(`Error aggregating feature tracks from '${filename}': ${e}`);
+        }
+
+        return result;
     }
 }

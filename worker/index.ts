@@ -38,6 +38,6 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMess
         reply({ sound });
     } catch (error) {
         console.error(error);
-        reply({ error });
+        reply({ error, sound: data.sound });
     }
 });

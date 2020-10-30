@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { Button, Box } from 'rebass';
 
 import Header from '../components/header';
-import AnalyzerProgress from '../components/analyzer-progress';
+import AnalyzerStatus from '../components/analyzer-status';
 import SelectFolder from '../components/select-folder';
 import Samples from '../components/samples';
 import Groups from '../components/groups';
@@ -22,9 +22,9 @@ function Home({ group }: { group?: string }) {
     };
 
     const getSounds = useCallback(async () => {
-        if (!ipcService) return [];
+        if (!ipcService) return;
         await ipcService.getSounds({}, dispatch);
-    }, [ipcService]);
+    }, [ipcService, dispatch]);
 
     const clear = async () => {
         if (!ipcService) return;
@@ -37,12 +37,17 @@ function Home({ group }: { group?: string }) {
         getSounds();
     }, [ipcService, getSounds]);
 
+    useEffect(() => {
+        if (!state.analyzer.running) {
+            // just stopped, get sounds
+            getSounds();
+        }
+    }, [state.analyzer.running, getSounds]);
+
     const onSelect = async (path) => {
         await analyze(path);
         getSounds();
     };
-
-    console.log(state.sounds.data);
 
     return (
         <>
@@ -59,7 +64,7 @@ function Home({ group }: { group?: string }) {
                     )}
                     <SelectFolder onChange={onSelect} />
                 </Box>
-                <AnalyzerProgress />
+                <AnalyzerStatus />
                 {hasSounds && (showGroups ? <Groups /> : <Samples sounds={state.sounds.data} group={group} />)}
             </div>
         </>

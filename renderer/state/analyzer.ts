@@ -2,7 +2,7 @@
  * This file describes the analyzer part of the state tree
  */
 export interface AnalyzerError {
-    error: string;
+    message: string;
     filename?: string;
 }
 

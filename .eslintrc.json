@@ -26,7 +26,8 @@
     "no-underscore-dangle": "warn",
     "no-use-before-define": [0],
     "no-useless-constructor": "off",
-    "react/jsx-props-no-spreading": "off"
+    "react/jsx-props-no-spreading": "off",
+    "react/require-default-props": "off"
   },
   "settings": {
     "import/core-modules": [ "electron" ],

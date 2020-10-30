@@ -1,6 +1,5 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Box, Heading } from 'rebass';
-import { UrlObject } from 'url';
 import Clickable from './clickable';
 import type { Url } from '../../@types';
 
@@ -10,18 +9,24 @@ const Card = ({
     children,
     onClick,
     href,
-    ...rest
+    clickable = true,
+    className,
 }: {
     title?: string;
     active?: boolean;
     href?: Url;
     onClick?: () => void;
     children?: React.ReactNode;
+    clickable?: boolean;
+    className?: string;
 }) => {
-    const activeStyle = {
-        borderWidth: '3px',
-        borderColor: 'primary',
-    };
+    let activeStyle = {};
+    if (clickable) {
+        activeStyle = {
+            borderWidth: '3px',
+            borderColor: 'primary',
+        };
+    }
     const style = {
         borderRadius: '7px',
         borderWidth: '1px',
@@ -33,7 +38,7 @@ const Card = ({
         },
     };
     return (
-        <Clickable href={href} onClick={onClick}>
+        <Clickable href={href} onClick={onClick} className={className}>
             <Box p={3} mx={2} my={2} sx={active ? { ...style, ...activeStyle } : style} bg='white'>
                 {!!title && (
                     <Heading my={2} color='primary' fontWeight='bold' fontSize={[4, 3]}>
