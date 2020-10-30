@@ -1,10 +1,8 @@
-import React from 'react';
-import { UrlObject } from 'url';
-import Link from './link';
 import styled from '@emotion/styled';
+import React from 'react';
+import Link from './link';
 import type { Theme } from '../theme';
 import type { Url } from '../../@types';
-import { StringLiteral } from 'typescript';
 
 const Button = styled.button`
     background: none;

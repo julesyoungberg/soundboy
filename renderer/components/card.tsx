@@ -1,6 +1,5 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Box, Heading } from 'rebass';
-import { UrlObject } from 'url';
 import Clickable from './clickable';
 import type { Url } from '../../@types';
 
@@ -12,7 +11,6 @@ const Card = ({
     href,
     clickable = true,
     className,
-    ...rest
 }: {
     title?: string;
     active?: boolean;
