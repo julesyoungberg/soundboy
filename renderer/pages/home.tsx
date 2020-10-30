@@ -22,9 +22,9 @@ function Home({ group }: { group?: string }) {
     };
 
     const getSounds = useCallback(async () => {
-        if (!ipcService) return [];
+        if (!ipcService) return;
         await ipcService.getSounds({}, dispatch);
-    }, [ipcService]);
+    }, [ipcService, dispatch]);
 
     const clear = async () => {
         if (!ipcService) return;
