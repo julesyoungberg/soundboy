@@ -9,7 +9,6 @@ const Card = ({
     children,
     onClick,
     href,
-    clickable = true,
     className,
 }: {
     title?: string;
@@ -17,10 +16,10 @@ const Card = ({
     href?: Url;
     onClick?: () => void;
     children?: React.ReactNode;
-    clickable?: boolean;
     className?: string;
 }) => {
     let activeStyle = {};
+    const clickable = typeof href != 'undefined' || typeof onClick === 'function';
     if (clickable) {
         activeStyle = {
             borderWidth: '3px',

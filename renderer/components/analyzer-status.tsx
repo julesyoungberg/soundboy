@@ -77,7 +77,7 @@ export default function AnalyzerStatus() {
     }
 
     return (
-        <Container clickable={false}>
+        <Container>
             {headerContent}
             {analyzer.errors.length > 0 && (
                 <Errors>

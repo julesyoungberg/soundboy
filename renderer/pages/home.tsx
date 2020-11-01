@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import Head from 'next/head';
-import { Button, Box } from 'rebass';
+import { Button, Flex, Box } from 'rebass';
 
 import Header from '../components/header';
 import AnalyzerStatus from '../components/analyzer-status';
@@ -9,6 +9,7 @@ import Samples from '../components/samples';
 import Groups from '../components/groups';
 import useAppState from '../hooks/useAppState';
 import useIpcService from '../hooks/useIpcService';
+import { MainAudioPlayer } from '../components/audio-player';
 
 function Home({ group }: { group?: string }) {
     const { dispatch, state } = useAppState();
@@ -56,13 +57,18 @@ function Home({ group }: { group?: string }) {
             </Head>
             <div>
                 <Box px={3}>
-                    <Header />
-                    {state.sounds.data.length > 0 && (
-                        <Button onClick={clear} variant='primary' mr={2}>
-                            Clear Sounds
-                        </Button>
-                    )}
-                    <SelectFolder onChange={onSelect} />
+                    <Flex width='100%' justifyContent='space-between' flexWrap='wrap'>
+                        <Box>
+                            <Header />
+                            {state.sounds.data.length > 0 && (
+                                <Button onClick={clear} variant='primary' mr={2}>
+                                    Clear Sounds
+                                </Button>
+                            )}
+                            <SelectFolder onChange={onSelect} />
+                        </Box>
+                        {hasSounds && !showGroups && <MainAudioPlayer />}
+                    </Flex>
                 </Box>
                 <AnalyzerStatus />
                 {hasSounds && (showGroups ? <Groups /> : <Samples sounds={state.sounds.data} group={group} />)}

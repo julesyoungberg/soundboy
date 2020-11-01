@@ -2,6 +2,7 @@ import theme from '@rebass/preset';
 
 const mTheme = {
     ...theme,
+    breakpoints: ['40em', '52em', '64em'],
     colors: {
         ...theme.colors,
         black: '#242322',
