@@ -35,7 +35,7 @@ const AudioPlayer = ({
     waveColor?: string;
     progressColor?: string;
 }) => {
-    const { dispatch, state } = useAppState();
+    const { dispatch } = useAppState();
     const theme = useTheme();
     const waveColor = initialWaveColor || theme.colors.white;
     const progressColor = initialProgressColor || theme.colors.accent;
