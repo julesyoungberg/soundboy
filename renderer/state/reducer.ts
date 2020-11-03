@@ -3,6 +3,7 @@
  */
 import Action from './action';
 import { initialState, State } from '.';
+import type { NowPlaying } from './sounds';
 
 /**
  * An analyzation has been initiated
@@ -96,6 +97,60 @@ function fetchSoundsResponse(state: State, action: Action): State {
     };
 }
 
+function toNowPlaying(action: Action): NowPlaying {
+    const { payload } = action;
+    // @ts-ignore
+    if (payload.hasOwnProperty('sound') && payload.hasOwnProperty('audio')) return { ...payload, playing: true };
+    return null;
+}
+
+function playSound(state: State, action: Action): State {
+    const nextTrack = toNowPlaying(action);
+    const { audio, sound } = state.sounds.nowPlaying || {};
+    if (audio && nextTrack.sound?._id !== sound?._id) {
+        audio.stop();
+    }
+    return {
+        ...state,
+        sounds: {
+            ...state.sounds,
+            nowPlaying: nextTrack,
+        },
+    };
+}
+
+function stopSound(state: State, action: Action): State {
+    const prevTrack = toNowPlaying(action);
+    const { audio, sound } = state.sounds.nowPlaying || {};
+    const nowPlaying = prevTrack;
+    if (audio && prevTrack.sound?._id === sound?._id) {
+        nowPlaying.playing = false;
+    }
+    return {
+        ...state,
+        sounds: {
+            ...state.sounds,
+            nowPlaying,
+        },
+    };
+}
+
+function clearSound(state: State, action: Action): State {
+    const prevTrack = toNowPlaying(action);
+    const { audio, sound, playing } = state.sounds.nowPlaying || {};
+    let nowPlaying = { audio, sound, playing };
+    if (audio && prevTrack.sound?._id === nowPlaying.sound?._id) {
+        nowPlaying = null;
+    }
+    return {
+        ...state,
+        sounds: {
+            ...state.sounds,
+            nowPlaying,
+        },
+    };
+}
+
 /**
  * Main top-level application reducer
  * @param state
@@ -116,6 +171,12 @@ export default function reducer(state: State = initialState, action: Action): St
             return fetchSoundsRequest(state, action);
         case 'fetch_sounds_response':
             return fetchSoundsResponse(state, action);
+        case 'play_sound':
+            return playSound(state, action);
+        case 'stop_sound':
+            return stopSound(state, action);
+        case 'clear_sound':
+            return clearSound(state, action);
         default:
             return state;
     }
