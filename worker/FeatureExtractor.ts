@@ -19,6 +19,8 @@ const FEATURES = [
     'spectralKurtosis',
 ];
 
+const PITCHES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
 interface FeatureExtractorOptions {
     frameSize?: number;
     hopSize?: number;
@@ -63,11 +65,11 @@ const initialFeatureTracks = (): FeatureTracks => ({
  */
 export default class FeatureExtractor {
     frameSize = 2048;
-    hopSize = 512;
+    hopSize = 1024;
 
     constructor(config: FeatureExtractorOptions = {}) {
-        this.frameSize = config.frameSize || 2048;
-        this.hopSize = config.hopSize || 512;
+        if (config.frameSize) this.frameSize = config.frameSize;
+        if (config.hopSize) this.hopSize = config.hopSize;
     }
 
     /**
@@ -110,7 +112,7 @@ export default class FeatureExtractor {
      */
     computeFeatureStats(featureTracks: FeatureTracks): Partial<Sound> {
         return Object.keys(featureTracks).reduce((result, feature) => {
-            const featureTrack = featureTracks[feature].map((item) =>
+            const featureTrack = featureTracks[feature].map((item: number | number[]) =>
                 Array.isArray(item) || !Number.isNaN(item) ? item : 0
             );
             const t = tf.tensor(featureTrack);
@@ -156,6 +158,16 @@ export default class FeatureExtractor {
             result = { ...features, filename };
         } catch (e) {
             throw new Error(`Error aggregating feature tracks from '${filename}': ${e}`);
+        }
+
+        try {
+            if (result.chroma) {
+                const t = tf.tensor(result.chroma.mean);
+                const pitchIndex = t.argMax().dataSync()[0];
+                result.pitch = PITCHES[pitchIndex];
+            }
+        } catch (e) {
+            throw new Error(`Error detecting pitch from '${filename}': ${e}`);
         }
 
         return result;

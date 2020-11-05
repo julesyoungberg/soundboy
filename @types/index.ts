@@ -22,6 +22,7 @@ export interface Sound {
     mfcc?: ArrayFeature;
     perceptualSharpness?: Feature;
     perceptualSpread?: Feature;
+    pitch?: string;
     spectralCentroid?: Feature;
     spectralFlatness?: Feature;
     spectralFlux?: Feature;
