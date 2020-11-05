@@ -97,16 +97,15 @@ function fetchSoundsResponse(state: State, action: Action): State {
     };
 }
 
-function toNowPlaying(payload: Action['payload'] = {}): NowPlaying {
-    const { audio, sound } = payload;
-    if (sound && audio) {
-        return { audio, playing: true, sound };
-    }
+function toNowPlaying(action: Action): NowPlaying {
+    const { payload } = action;
+    // @ts-ignore
+    if (payload.hasOwnProperty('sound') && payload.hasOwnProperty('audio')) return { ...payload, playing: true };
     return null;
 }
 
 function playSound(state: State, action: Action): State {
-    const nextTrack = toNowPlaying(action.payload);
+    const nextTrack = toNowPlaying(action);
     const { audio, sound } = state.sounds.nowPlaying || {};
     if (audio && nextTrack.sound?._id !== sound?._id) {
         audio.stop();
@@ -121,7 +120,7 @@ function playSound(state: State, action: Action): State {
 }
 
 function stopSound(state: State, action: Action): State {
-    const prevTrack = toNowPlaying(action.payload);
+    const prevTrack = toNowPlaying(action);
     const { audio, sound } = state.sounds.nowPlaying || {};
     const nowPlaying = prevTrack;
     if (audio && prevTrack.sound?._id === sound?._id) {
