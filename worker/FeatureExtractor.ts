@@ -119,20 +119,20 @@ export default class FeatureExtractor {
             // compute stats
             const stats = tf.moments(t, [0]);
             const mean = stats.mean.dataSync();
-            const variance = stats.mean.dataSync();
+            const std = stats.variance.sqrt().dataSync();
             let data: Feature | ArrayFeature | undefined;
 
             if (['chroma', 'mfcc'].includes(feature)) {
                 // convert array featurs to plain array
                 data = {
                     mean: Array.from(mean),
-                    variance: Array.from(variance),
+                    std: Array.from(std),
                 };
             } else {
                 // get single value for regular features
                 data = {
                     mean: mean[0],
-                    variance: variance[0],
+                    std: std[0],
                 };
             }
 
