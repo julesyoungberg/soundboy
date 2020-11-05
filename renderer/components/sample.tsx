@@ -1,8 +1,6 @@
 import React from 'react';
-import { Box, Text } from 'rebass';
-import styled from '@emotion/styled';
+import { Box } from 'rebass';
 
-import Card from './card';
 import { Sound } from '../../@types';
 import { AudioPlayer } from './audio-player';
 

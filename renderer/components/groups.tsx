@@ -1,8 +1,6 @@
 import React from 'react';
 import { Box } from 'rebass';
 
-import { Sound } from '../../@types';
-
 import Card from './card';
 
 const GROUPS = ['Instrument', 'Loudness', 'Genre', 'Tempo', 'Pitch'];

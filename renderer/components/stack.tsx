@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, Text } from 'rebass';
+import { Flex } from 'rebass';
 
 const Stack = ({ children }: { children: React.ReactNode }) => {
     return (
