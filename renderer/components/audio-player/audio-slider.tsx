@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { Text } from 'rebass';
 import { Slider } from '@rebass/forms';
-import { Flex } from 'rebass';
+import { Text } from 'rebass';
 import throttle from 'lodash.throttle';
 import Stack from '../stack';
 
