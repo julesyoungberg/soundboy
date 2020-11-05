@@ -19,7 +19,7 @@ const Card = ({
     className?: string;
 }) => {
     let activeStyle = {};
-    const clickable = typeof href != 'undefined' || typeof onClick === 'function';
+    const clickable = typeof href !== 'undefined' || typeof onClick === 'function';
     if (clickable) {
         activeStyle = {
             borderWidth: '3px',

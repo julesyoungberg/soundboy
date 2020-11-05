@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React from 'react';
 import { Box, Heading, Flex } from 'rebass';
 import { BsMusicNoteList } from 'react-icons/bs';
 import styled from '@emotion/styled';

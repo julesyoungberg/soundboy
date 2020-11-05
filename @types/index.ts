@@ -4,12 +4,12 @@ export type Url = string | UrlObject;
 
 export interface Feature {
     mean: number;
-    variance: number;
+    std: number;
 }
 
 export interface ArrayFeature {
     mean: number[];
-    variance: number[];
+    std: number[];
 }
 
 // read about the audio features here: https://meyda.js.org/audio-features
@@ -22,6 +22,7 @@ export interface Sound {
     mfcc?: ArrayFeature;
     perceptualSharpness?: Feature;
     perceptualSpread?: Feature;
+    pitch?: string;
     spectralCentroid?: Feature;
     spectralFlatness?: Feature;
     spectralFlux?: Feature;
