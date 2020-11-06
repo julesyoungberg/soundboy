@@ -7,7 +7,7 @@ import { TASKS_CHANNEL, RESULTS_CHANNEL } from '../constants';
 import getSoundFiles from '../util/getSoundFiles';
 import db from './db';
 
-const NUM_WORKERS = Math.ceil(os.cpus().length / 2);
+const NUM_WORKERS = Math.ceil(os.cpus().length);
 
 function createWorkerWindow() {
     const window = new BrowserWindow({
