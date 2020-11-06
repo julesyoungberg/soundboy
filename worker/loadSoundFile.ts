@@ -27,7 +27,7 @@ export function downsampleBuffer(sourceBuffer: AudioBuffer, targetRate: number):
 
     // create mono input buffer
     const buffer = ctx.createBuffer(1, sourceBuffer.length, sourceBuffer.sampleRate);
-    buffer.copyFromChannel(toMono(sourceBuffer), 0);
+    buffer.copyToChannel(toMono(sourceBuffer), 0);
 
     // connect the buffer to the context
     const source = ctx.createBufferSource();

@@ -18,6 +18,7 @@ function createWorkerWindow() {
     });
 
     window.loadURL(`file://${path.resolve(__dirname, '../worker/dist/index.html')}`);
+    // window.webContents.openDevTools();
     return window;
 }
 
@@ -101,7 +102,7 @@ export default class Analyzer {
         } else {
             // kill worker since there's no more work
             console.log('killing worker');
-            this.workers[result.workerID]?.close();
+            // this.workers[result.workerID]?.close();
             this.workers[result.workerID] = undefined;
 
             // check if done
