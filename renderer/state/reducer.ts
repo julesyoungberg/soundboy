@@ -90,6 +90,7 @@ function fetchSoundsResponse(state: State, action: Action): State {
     return {
         ...state,
         sounds: {
+            ...state.sounds,
             data: action.payload.results,
             error: action.payload.error,
             fetching: false,
@@ -123,7 +124,8 @@ function playSound(state: State, action: Action): State {
 function stopSound(state: State, action: Action): State {
     const prevTrack = toNowPlaying(action.payload);
     const nowPlaying = state.sounds.nowPlaying;
-    const { audio, sound } = nowPlaying;
+    const audio = nowPlaying?.audio;
+    const sound = nowPlaying?.sound;
     if (audio && prevTrack.sound?._id === sound?._id) {
         nowPlaying.playing = false;
     }
