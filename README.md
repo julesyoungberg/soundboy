@@ -31,8 +31,6 @@ There will also need to be a directory for python data collection and training.
     -   rhythm
 -   Interface
     -   reanalyze button and functionality
-    -   analyzation improvements
-        -   show pop up after analyzation with any failed sounds
     -   filter samples by perceptual features
         -   use buttons to generate NeDB queries
         -   E.g. filtering by `bright` may only return samples with a high enough spectral centroid
