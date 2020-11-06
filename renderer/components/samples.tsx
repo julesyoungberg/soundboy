@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Flex } from 'rebass';
+import React, { useEffect, useReducer, useState } from 'react';
+import { Box, Flex } from 'rebass';
+import { Label, Select } from '@rebass/forms';
 
 import { Sound } from '../../@types';
 import useAppState from '../hooks/useAppState';
@@ -7,53 +8,90 @@ import useIpcService from '../hooks/useIpcService';
 import queries from '../queries';
 
 import Sample from './sample';
-import Card from './card';
 import Stack from './stack';
 import List from './list';
-import BackButton from './back-button';
 
-const DEFAULT_RANGES = ['Low', 'Mid', 'High'];
-
-const RANGES = {
-    Instrument: DEFAULT_RANGES,
+const GROUPS = {
+    Instrument: ['Kick', 'Snare', 'Keys'],
     Pitch: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
 };
 
-const Samples = ({ sounds = [], group }: { sounds: Sound[]; group: string }) => {
-    const [header, setHeader] = useState<string | undefined>(DEFAULT_RANGES[0]);
+export interface SoundsFilter {
+    instrument: string;
+    pitch: string;
+    brightness: string;
+    noisiness: string;
+}
+
+const initialFilter = {
+    instrument: 'All',
+    pitch: 'All',
+    brightness: 'All',
+    noisiness: 'All',
+};
+
+const filterReducer = (state: SoundsFilter = initialFilter, action: Partial<SoundsFilter>): SoundsFilter => ({
+    ...state,
+    ...action,
+});
+
+const filterToQuery = (filterState: SoundsFilter) =>
+    Object.keys(filterState).reduce((acc, filter) => {
+        const v = filterState[filter];
+        if (v === 'All') {
+            return acc;
+        }
+
+        return {
+            ...acc,
+            ...queries[filter](v),
+        };
+    }, {});
+
+const Samples = ({ sounds = [] }: { sounds: Sound[] }) => {
+    const [filterState, filterDispatch] = useReducer(filterReducer, initialFilter);
+    const [header, setHeader] = useState<string>('');
     const { dispatch } = useAppState();
     const ipcService = useIpcService();
 
-    const getSounds = async (range: string = header) => {
+    const getSounds = async (q: Partial<SoundsFilter> = {}) => {
         if (!ipcService) return;
-        const query = queries[group.toLowerCase()](range);
-        console.log('getting sounds', query);
+        const query = filterToQuery({ ...filterState, ...q });
+        console.log(query);
         await ipcService.getSounds(query, dispatch);
     };
 
-    const selectRange = async (range: string) => {
-        setHeader(range);
-        await getSounds(range);
-    };
-
     useEffect(() => {
-        // TODO
-        // this should be selectRange but that causes the app to crash sometimes
-        setHeader(RANGES[group][0]);
-    }, [group]);
+        getSounds();
+    }, []);
+
+    const onUpdateFilterFactory = (filter: string) => async (event: any) => {
+        const { value } = event.target;
+        const query = { [filter]: value };
+        filterDispatch(query);
+        await getSounds(query);
+    };
 
     return (
         <Flex sx={{ width: '100%' }}>
             <Stack>
-                <BackButton />
-                {RANGES[group].map((range: string) => (
-                    <Card
-                        active={range === header}
-                        onClick={() => selectRange(range)}
-                        title={range}
-                        key={`range-${range}`}
-                    />
-                ))}
+                <Flex>
+                    {Object.entries(GROUPS).map(([key, options]) => (
+                        <Box key={key} width={1 / 2} style={{ padding: 10 }}>
+                            <Label htmlFor={key.toLowerCase()}>{key}</Label>
+                            <Select
+                                id={key.toLowerCase()}
+                                name={key}
+                                defaultValue='All'
+                                onChange={onUpdateFilterFactory(key.toLowerCase())}
+                            >
+                                {['All', ...options].map((opt) => (
+                                    <option key={opt}>{opt}</option>
+                                ))}
+                            </Select>
+                        </Box>
+                    ))}
+                </Flex>
             </Stack>
             <List title={header}>
                 <Stack>
