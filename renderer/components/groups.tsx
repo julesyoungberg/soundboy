@@ -3,7 +3,7 @@ import { Box } from 'rebass';
 
 import Card from './card';
 
-const GROUPS = ['Instrument', 'Loudness', 'Genre', 'Tempo', 'Pitch'];
+const GROUPS = ['Instrument', 'Pitch'];
 
 const Groups = () => (
     <Box

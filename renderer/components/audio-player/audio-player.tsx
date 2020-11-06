@@ -1,9 +1,7 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React from 'react';
 import styled from '@emotion/styled';
-import WaveSurfer from 'wavesurfer.js';
 import { Text } from 'rebass';
 import useTheme from '../../hooks/useTheme';
-import type { Theme } from '../../theme';
 import useAppState from '../../hooks/useAppState';
 import getFileName from '../../../util/getFileName';
 import PauseButton from './pause-button';
