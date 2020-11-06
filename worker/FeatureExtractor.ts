@@ -22,24 +22,26 @@ const FEATURES = [
 const PITCHES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 interface FeatureExtractorOptions {
+    features?: string[];
     frameSize?: number;
     hopSize?: number;
 }
 
 interface FeatureTracks {
-    chroma?: number[][];
-    loudness?: number[];
-    mfcc?: number[][];
-    perceptualSharpness?: number[];
-    perceptualSpread?: number[];
-    spectralCentroid?: number[];
-    spectralFlatness?: number[];
-    spectralFlux?: number[];
-    spectralSlope?: number[];
-    spectralRolloff?: number[];
-    spectralSpread?: number[];
-    spectralSkewness?: number[];
-    spectralKurtosis?: number[];
+    chroma: number[][];
+    loudness: number[];
+    mfcc: number[][];
+    perceptualSharpness: number[];
+    perceptualSpread: number[];
+    rms: number[];
+    spectralCentroid: number[];
+    spectralFlatness: number[];
+    // spectralFlux: number[];
+    spectralSlope: number[];
+    spectralRolloff: number[];
+    spectralSpread: number[];
+    spectralSkewness: number[];
+    spectralKurtosis: number[];
 }
 
 const initialFeatureTracks = (): FeatureTracks => ({
@@ -48,6 +50,7 @@ const initialFeatureTracks = (): FeatureTracks => ({
     mfcc: [],
     perceptualSharpness: [],
     perceptualSpread: [],
+    rms: [],
     spectralCentroid: [],
     spectralFlatness: [],
     // spectralFlux: [],
@@ -64,10 +67,12 @@ const initialFeatureTracks = (): FeatureTracks => ({
  * - holds the core signal processes logic for Soundboy
  */
 export default class FeatureExtractor {
+    features: string[] = FEATURES;
     frameSize = 2048;
     hopSize = 1024;
 
     constructor(config: FeatureExtractorOptions = {}) {
+        if (config.features) this.features = config.features;
         if (config.frameSize) this.frameSize = config.frameSize;
         if (config.hopSize) this.hopSize = config.hopSize;
     }
@@ -88,11 +93,11 @@ export default class FeatureExtractor {
             const frame = new Float32Array(this.frameSize).fill(0);
             frame.set(buffer.slice(offset, end));
 
-            const features = meyda.extract(FEATURES, frame, prevFrame);
+            const features = meyda.extract(this.features, frame, prevFrame);
             prevFrame = frame;
 
             // push features to appropriate tracks
-            FEATURES.forEach((feature) => {
+            this.features.forEach((feature) => {
                 const val = features[feature];
 
                 if (feature === 'loudness') {
@@ -111,7 +116,7 @@ export default class FeatureExtractor {
      * @param featureTracks
      */
     computeFeatureStats(featureTracks: FeatureTracks): Partial<Sound> {
-        return Object.keys(featureTracks).reduce((result, feature) => {
+        return this.features.reduce((result, feature) => {
             const featureTrack = featureTracks[feature].map((item: number | number[]) =>
                 Array.isArray(item) || !Number.isNaN(item) ? item : 0
             );
