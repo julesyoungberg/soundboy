@@ -70,7 +70,7 @@ function Home({ group }: { group?: string }) {
                     </Flex>
                 </Box>
                 <AnalyzerStatus />
-                {showGroups ? <Groups /> : <Samples sounds={state.sounds.data} group={group} />}
+                <Samples sounds={state.sounds.data} />
             </div>
         </>
     );
