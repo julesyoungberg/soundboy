@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Flex } from 'rebass';
 import { Text } from 'rebass';
 import AudioPlayer from './audio-player';
@@ -14,9 +14,23 @@ const MainAudioPlayer = () => {
     const input = useRef();
     const { dispatch, state } = useAppState();
     const { nowPlaying } = state.sounds;
-    const pause = () => nowPlaying?.audio.playPause();
     const playing = !!nowPlaying?.playing;
-    if (!nowPlaying) return null;
+    const audio = nowPlaying?.audio;
+    const pause = () => audio?.playPause();
+    useEffect(() => {
+        if (typeof document === 'undefined') return;
+        const onKeyDown = (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                pause();
+            }
+        };
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [audio]);
+    if (!nowPlaying || !nowPlaying.sound) return null;
     const filename = getFileName(nowPlaying.sound.filename);
     return (
         <Box sx={{ flex: '1', minWidth: '200px', marginTop: 3, marginBottom: 4 }}>
