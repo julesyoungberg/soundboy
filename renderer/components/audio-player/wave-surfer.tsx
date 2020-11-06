@@ -70,7 +70,15 @@ const withWave = (Component) => {
                 setPlaying(false);
             });
             return () => {
-                audio.stop();
+                try {
+                    audio.stop();
+                } catch (e) {
+                    // The case this fails is when WaveSurfer
+                    // tires to seek the audio to NaN.
+                    // We are destroying the audio in the next line
+                    // which should make sure its cleaned up.
+                    console.log(e);
+                }
                 if (onStop) onStop({ audio, sound });
                 audio.destroy();
             };
