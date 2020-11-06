@@ -122,8 +122,8 @@ function playSound(state: State, action: Action): State {
 
 function stopSound(state: State, action: Action): State {
     const prevTrack = toNowPlaying(action.payload);
-    const { audio, sound } = state.sounds.nowPlaying || {};
-    const nowPlaying = prevTrack;
+    const nowPlaying = state.sounds.nowPlaying;
+    const { audio, sound } = nowPlaying;
     if (audio && prevTrack.sound?._id === sound?._id) {
         nowPlaying.playing = false;
     }
