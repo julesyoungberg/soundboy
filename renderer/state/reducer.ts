@@ -70,7 +70,7 @@ function fetchSoundsRequest(state: State): State {
     return {
         ...state,
         sounds: {
-            data: [],
+            ...state.sounds,
             error: '',
             fetching: true,
         },

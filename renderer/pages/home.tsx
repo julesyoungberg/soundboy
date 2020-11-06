@@ -14,7 +14,6 @@ import { MainAudioPlayer } from '../components/audio-player';
 function Home({ group }: { group?: string }) {
     const { dispatch, state } = useAppState();
     const ipcService = useIpcService();
-    const hasSounds = state.sounds.data.length > 0;
     const showGroups = typeof group === 'undefined';
 
     const analyze = async (folder) => {
@@ -22,10 +21,10 @@ function Home({ group }: { group?: string }) {
         await ipcService.analyze(folder, dispatch);
     };
 
-    const getSounds = useCallback(async () => {
+    const getSounds = async () => {
         if (!ipcService) return;
         await ipcService.getSounds({}, dispatch);
-    }, [ipcService, dispatch]);
+    };
 
     const clear = async () => {
         if (!ipcService) return;
@@ -34,20 +33,19 @@ function Home({ group }: { group?: string }) {
     };
 
     useEffect(() => {
-        if (!ipcService) return;
-        getSounds();
-    }, [ipcService, getSounds]);
+        if (state.sounds.data.length === 0) {
+            getSounds();
+        }
+    }, [ipcService]);
 
     useEffect(() => {
         if (!state.analyzer.running) {
-            // just stopped, get sounds
             getSounds();
         }
-    }, [state.analyzer.running, getSounds]);
+    }, [state.analyzer.running]);
 
-    const onSelect = async (path) => {
+    const onSelect = async (path: string) => {
         await analyze(path);
-        getSounds();
     };
 
     return (
@@ -60,18 +58,16 @@ function Home({ group }: { group?: string }) {
                     <Flex width='100%' justifyContent='space-between' flexWrap='wrap'>
                         <Box>
                             <Header />
-                            {state.sounds.data.length > 0 && (
-                                <Button onClick={clear} variant='primary' mr={2}>
-                                    Clear Sounds
-                                </Button>
-                            )}
+                            <Button onClick={clear} variant='primary' mr={2}>
+                                Clear Sounds
+                            </Button>
                             <SelectFolder onChange={onSelect} />
                         </Box>
-                        {hasSounds && !showGroups && <MainAudioPlayer />}
+                        {!showGroups && <MainAudioPlayer />}
                     </Flex>
                 </Box>
                 <AnalyzerStatus />
-                {hasSounds && (showGroups ? <Groups /> : <Samples sounds={state.sounds.data} group={group} />)}
+                {(showGroups ? <Groups /> : <Samples sounds={state.sounds.data} group={group} />)}
             </div>
         </>
     );
