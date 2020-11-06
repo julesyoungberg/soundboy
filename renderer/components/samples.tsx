@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
-import { Box, Flex } from 'rebass';
+import { Box, Button, Flex } from 'rebass';
 import { Label, Select } from '@rebass/forms';
 
 import { Sound } from '../../@types';
@@ -7,6 +7,7 @@ import useAppState from '../hooks/useAppState';
 import useIpcService from '../hooks/useIpcService';
 import queries from '../queries';
 
+import FilterPair from './filter-pair';
 import Sample from './sample';
 import Stack from './stack';
 import List from './list';
@@ -66,7 +67,12 @@ const Samples = ({ sounds = [] }: { sounds: Sound[] }) => {
     }, []);
 
     const onUpdateFilterFactory = (filter: string) => async (event: any) => {
-        const { value } = event.target;
+        let value: string = 'All';
+        if (typeof event === 'string') {
+            value = event;
+        } else if (event.target) {
+            value = event.target.value;
+        }
         const query = { [filter]: value };
         filterDispatch(query);
         await getSounds(query);
@@ -92,6 +98,12 @@ const Samples = ({ sounds = [] }: { sounds: Sound[] }) => {
                         </Box>
                     ))}
                 </Flex>
+                <FilterPair
+                    current={filterState.brightness}
+                    option1='Bright'
+                    option2='Dark'
+                    onChange={onUpdateFilterFactory('brightness')}
+                />
             </Stack>
             <List title={header}>
                 <Stack>
