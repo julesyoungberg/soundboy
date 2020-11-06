@@ -1,14 +1,31 @@
 import { IpcRendererEvent } from 'electron';
 
-import { AnalyzerMessage } from '../@types';
+import { AnalyzerMessage, Sound } from '../@types';
 import { TASKS_CHANNEL, RESULTS_CHANNEL } from '../constants';
 
-import analyze from './analyze';
+import FeatureExtractor from './FeatureExtractor';
+import loadSoundFile from './loadSoundFile';
+import trimSamples from './trimSamples';
 
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
 console.log(`Listening for tasks on channel: ${TASKS_CHANNEL}`);
+
+const extractor = new FeatureExtractor();
+
+/**
+ * Main worker function for analyzing a sound file
+ * @param filename
+ * @returns sound analysis data
+ */
+export default async function analyze(filename: string): Promise<Sound> {
+    console.log('Analyze Worker - filename: ', filename);
+
+    const buffer = trimSamples(await loadSoundFile(filename));
+
+    return extractor.getFeatures(buffer, filename);
+}
 
 /**
  * Main worker logic
