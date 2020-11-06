@@ -10,9 +10,48 @@ import trimSamples from './trimSamples';
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-console.log(`Listening for tasks on channel: ${TASKS_CHANNEL}`);
+const SAMPLE_RATE = 22050;
+const FRAME_SIZE = 2048;
+const HOP_SIZE = 1024;
+const MAX_CLIP_LENGTH = 5; // seconds
 
-const extractor = new FeatureExtractor();
+const extractor = new FeatureExtractor({
+    frameSize: FRAME_SIZE,
+    hopSize: HOP_SIZE,
+});
+
+/**
+ * Appends the desired number of zeros onto the input buffer
+ * @param input
+ * @param numZeros
+ */
+function zeroPad(input: Float32Array, numZeros: number) {
+    const output = new Float32Array(input.length + numZeros).fill(0);
+    for (let i = 0; i < input.length; i++) {
+        output[i] = input[i];
+    }
+
+    return output;
+}
+
+/**
+ * Standardize the length of the input buffer to fit within the frame size and max length
+ * @param input
+ */
+function standardize(input: Float32Array) {
+    const min = FRAME_SIZE;
+    const max = MAX_CLIP_LENGTH * SAMPLE_RATE;
+
+    if (input.length < min) {
+        return zeroPad(input, min - input.length);
+    }
+
+    if (input.length > max) {
+        return input.subarray(0, max);
+    }
+
+    return input;
+}
 
 /**
  * Main worker function for analyzing a sound file
@@ -22,7 +61,8 @@ const extractor = new FeatureExtractor();
 export default async function analyze(filename: string): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
 
-    const buffer = trimSamples(await loadSoundFile(filename));
+    let buffer = await loadSoundFile(filename, SAMPLE_RATE);
+    buffer = standardize(trimSamples(buffer));
 
     return extractor.getFeatures(buffer, filename);
 }
@@ -58,3 +98,5 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMess
         reply({ error, sound: data.sound });
     }
 });
+
+console.log(`Listening for tasks on channel: ${TASKS_CHANNEL}`);

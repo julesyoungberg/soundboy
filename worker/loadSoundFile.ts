@@ -1,7 +1,9 @@
 import load from 'audio-loader';
 
-const SAMPLE_RATE = 22050;
-
+/**
+ * converts a stereo audio buffer to mono or returns the mono buffer
+ * @param buffer
+ */
 export function toMono(buffer: AudioBuffer) {
     if (buffer.numberOfChannels === 1) {
         return buffer.getChannelData(0);
@@ -16,16 +18,23 @@ export function toMono(buffer: AudioBuffer) {
     throw new Error('unexpected number of channels');
 }
 
-export function downsampleBuffer(sourceBuffer: AudioBuffer): Promise<Float32Array> {
-    const ctx = new OfflineAudioContext(1, sourceBuffer.duration * 1 * SAMPLE_RATE, SAMPLE_RATE);
-    const buffer = ctx.createBuffer(1, sourceBuffer.length, sourceBuffer.sampleRate);
+/**
+ * Downsamples an audio buffer to the target sample rate using an offline context
+ * @param sourceBuffer
+ */
+export function downsampleBuffer(sourceBuffer: AudioBuffer, targetRate: number): Promise<Float32Array> {
+    const ctx = new OfflineAudioContext(1, sourceBuffer.duration * targetRate, targetRate);
 
+    // create mono input buffer
+    const buffer = ctx.createBuffer(1, sourceBuffer.length, sourceBuffer.sampleRate);
     buffer.copyFromChannel(toMono(sourceBuffer), 0);
 
+    // connect the buffer to the context
     const source = ctx.createBufferSource();
     source.buffer = buffer;
     source.connect(ctx.destination);
 
+    // resolve when the source buffer has been rendered to a downsampled buffer
     return new Promise((resolve) => {
         ctx.oncomplete = (e) => {
             const rendered = e.renderedBuffer;
@@ -38,7 +47,12 @@ export function downsampleBuffer(sourceBuffer: AudioBuffer): Promise<Float32Arra
     });
 }
 
-export default async function loadSoundFile(filename: string, downsample?: boolean): Promise<Float32Array> {
+/**
+ * loads a soundfile and returns the downsampled buffer
+ * @param filename
+ * @param downsample
+ */
+export default async function loadSoundFile(filename: string, sampleRate?: number): Promise<Float32Array> {
     let buffer: AudioBuffer | undefined;
     try {
         buffer = await load(filename);
@@ -46,13 +60,13 @@ export default async function loadSoundFile(filename: string, downsample?: boole
         throw new Error(`Error loading '${filename}': ${e}`);
     }
 
-    if (!downsample) {
+    if (!sampleRate) {
         return toMono(buffer);
     }
 
     let samples: Float32Array | undefined;
     try {
-        samples = await downsampleBuffer(buffer);
+        samples = await downsampleBuffer(buffer, sampleRate);
     } catch (e) {
         throw new Error(`Error downsampling '${filename}' to mono: ${e}`);
     }
