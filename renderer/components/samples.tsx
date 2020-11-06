@@ -15,34 +15,41 @@ import BackButton from './back-button';
 const DEFAULT_RANGES = ['Low', 'Mid', 'High'];
 
 const RANGES = {
-    'Instrument': DEFAULT_RANGES,
-    'Pitch': ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+    Instrument: DEFAULT_RANGES,
+    Pitch: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
 };
 
 const Samples = ({ sounds = [], group }: { sounds: Sound[]; group: string }) => {
     const [header, setHeader] = useState<string | undefined>(DEFAULT_RANGES[0]);
-    const { dispatch, state } = useAppState();
+    const { dispatch } = useAppState();
     const ipcService = useIpcService();
 
-    const ranges = RANGES[group];
+    const getSounds = async (range: string = header) => {
+        if (!ipcService) return;
+        const query = queries[group.toLowerCase()](range);
+        console.log('getting sounds', query);
+        await ipcService.getSounds(query, dispatch);
+    };
+
+    const selectRange = async (range: string) => {
+        setHeader(range);
+        await getSounds(range);
+    };
 
     useEffect(() => {
-        setHeader(ranges[0]);
-    }, [setHeader, ranges]);
-
-    const handleSelectRange = async (range: string) => {
-        setHeader(range);
-        await ipcService.getSounds(queries[group](range), dispatch);
-    };
+        // TODO
+        // this should be selectRange but that causes the app to crash sometimes
+        setHeader(RANGES[group][0]);
+    }, [group]);
 
     return (
         <Flex sx={{ width: '100%' }}>
             <Stack>
                 <BackButton />
-                {ranges.map((range: string) => (
+                {RANGES[group].map((range: string) => (
                     <Card
                         active={range === header}
-                        onClick={() => handleSelectRange(range)}
+                        onClick={() => selectRange(range)}
                         title={range}
                         key={`range-${range}`}
                     />

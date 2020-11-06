@@ -1,8 +1,8 @@
 export default {
-    'Instrument': (value: string) => {
+    instrument(value: string) {
         return {};
     },
-    'Pitch': (pitch: string) => {
+    pitch(pitch: string) {
         return { pitch };
     },
 };

@@ -16,33 +16,36 @@ function Home({ group }: { group?: string }) {
     const ipcService = useIpcService();
     const showGroups = typeof group === 'undefined';
 
-    const analyze = async (folder) => {
-        if (!ipcService) return;
-        await ipcService.analyze(folder, dispatch);
-    };
+    const analyze = useCallback(
+        async (folder) => {
+            if (!ipcService) return;
+            await ipcService.analyze(folder, dispatch);
+        },
+        [ipcService, dispatch]
+    );
 
-    const getSounds = async () => {
+    const getSounds = useCallback(async () => {
         if (!ipcService) return;
         await ipcService.getSounds({}, dispatch);
-    };
+    }, [ipcService, dispatch]);
 
-    const clear = async () => {
+    const clear = useCallback(async () => {
         if (!ipcService) return;
         await ipcService.clearSounds();
         getSounds();
-    };
+    }, [ipcService, getSounds]);
 
     useEffect(() => {
         if (state.sounds.data.length === 0) {
             getSounds();
         }
-    }, [ipcService]);
+    }, [ipcService, getSounds]);
 
     useEffect(() => {
         if (!state.analyzer.running) {
             getSounds();
         }
-    }, [state.analyzer.running]);
+    }, [state.analyzer.running, getSounds]);
 
     const onSelect = async (path: string) => {
         await analyze(path);
@@ -67,7 +70,7 @@ function Home({ group }: { group?: string }) {
                     </Flex>
                 </Box>
                 <AnalyzerStatus />
-                {(showGroups ? <Groups /> : <Samples sounds={state.sounds.data} group={group} />)}
+                {showGroups ? <Groups /> : <Samples sounds={state.sounds.data} group={group} />}
             </div>
         </>
     );
