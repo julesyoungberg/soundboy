@@ -11,7 +11,7 @@ import Card from './card';
 import Clickable from './clickable';
 
 const Container = styled(Card)`
-    margin-top: 10px;
+    margin-top: 22px;
 `;
 
 const ProgressContainer = styled(Box)`

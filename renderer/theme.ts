@@ -15,7 +15,10 @@ const mTheme = {
         blue: '#07c',
         lightgray: '#f6f6ff',
         primary: '#1d53ff',
-        accent: '#f72f5a',
+        accent: '#1f83ed',
+    },
+    shadows: {
+        normal: '-4px 4px 50px -12px rgb(185 185 185 / 56%)',
     },
 };
 

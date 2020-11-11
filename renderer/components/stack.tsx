@@ -1,9 +1,9 @@
 import React from 'react';
 import { Flex } from 'rebass';
 
-const Stack = ({ children }: { children: React.ReactNode }) => {
+const Stack = ({ children, marginLeft }: { children: React.ReactNode; marginLeft?: number }) => {
     return (
-        <Flex sx={{ width: '100%' }} flexDirection='column'>
+        <Flex sx={{ width: '100%' }} flexDirection='column' marginLeft={marginLeft}>
             {children}
         </Flex>
     );

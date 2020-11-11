@@ -26,16 +26,19 @@ const WaveForm = withWave(
 
 const AudioPlayer = ({
     sound,
+    contentColor: initialContentColor,
     waveColor: initialWaveColor,
     progressColor: initialProgressColor,
 }: {
     sound: Sound;
     waveColor?: string;
     progressColor?: string;
+    contentColor?: string;
 }) => {
     const { dispatch } = useAppState();
     const theme = useTheme();
-    const waveColor = initialWaveColor || theme.colors.white;
+    const contentColor = initialContentColor || theme.colors.black;
+    const waveColor = initialWaveColor || theme.colors.grey;
     const progressColor = initialProgressColor || theme.colors.accent;
     const { filename: path } = sound;
     const filename = getFileName(path);
@@ -61,12 +64,7 @@ const AudioPlayer = ({
     };
     return (
         <WaveContainer>
-            <WaveForm sound={sound} options={options} waveColor={waveColor} />
-            {!!filename && (
-                <Text mx={1} my={2} color={waveColor} fontStyle='italic' fontSize={[1, 2]}>
-                    {filename}
-                </Text>
-            )}
+            <WaveForm sound={sound} options={options} waveColor={contentColor} />
         </WaveContainer>
     );
 };
