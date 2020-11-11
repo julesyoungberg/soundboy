@@ -17,7 +17,7 @@ export interface Sound {
     _id?: string;
     filename: string;
     chroma?: ArrayFeature;
-    instrument?: Feature;
+    instrument?: string;
     loudness?: Feature;
     mfcc?: ArrayFeature;
     perceptualSharpness?: Feature;

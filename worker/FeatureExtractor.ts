@@ -3,7 +3,10 @@ import meyda from 'meyda/dist/node/main';
 
 import { ArrayFeature, Feature, Sound } from '../@types';
 
+import Classifier, { N_MFCCS } from './Classifier';
+
 const FEATURES = [
+    // Meyda Feaures
     'chroma',
     'loudness',
     'mfcc',
@@ -17,6 +20,9 @@ const FEATURES = [
     'spectralSpread',
     'spectralSkewness',
     'spectralKurtosis',
+
+    // ML Features
+    'instrument',
 ];
 
 const PITCHES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -70,11 +76,22 @@ export default class FeatureExtractor {
     features: string[] = FEATURES;
     frameSize = 2048;
     hopSize = 1024;
+    classifier: Classifier | undefined;
 
     constructor(config: FeatureExtractorOptions = {}) {
         if (config.features) this.features = config.features;
         if (config.frameSize) this.frameSize = config.frameSize;
         if (config.hopSize) this.hopSize = config.hopSize;
+
+        if (this.features.includes('instrument')) {
+            // this.features should only contain meyda features
+            this.features = this.features.filter((feature) => feature !== 'instrument');
+            this.classifier = new Classifier();
+        }
+    }
+
+    async setup() {
+        await this.classifier?.setup();
     }
 
     /**
@@ -84,6 +101,7 @@ export default class FeatureExtractor {
     getFeatureTracks(buffer: Float32Array): FeatureTracks {
         const results = initialFeatureTracks();
         meyda.bufferSize = this.frameSize;
+        meyda.numberOfMFCCCoefficients = N_MFCCS;
         let prevFrame = new Float32Array();
 
         // hop through buffer
@@ -146,10 +164,32 @@ export default class FeatureExtractor {
     }
 
     /**
+     * High level classification algorithm
+     * @param featureTracks
+     */
+    async getInstrument({ mfcc }: FeatureTracks): Promise<string | undefined> {
+        if (!(this.classifier && mfcc && mfcc.length > 0)) {
+            return undefined;
+        }
+
+        try {
+            // lazily setup classifier
+            if (!this.classifier.ready()) {
+                await this.classifier.setup();
+            }
+        } catch (e) {
+            throw new Error(`Error loading classification model: ${e}`);
+        }
+
+        const instrument = await this.classifier.classify(mfcc);
+        return instrument;
+    }
+
+    /**
      * Main algorithm that takes a signal buffer and returns feature stats
      * @param buffer
      */
-    getFeatures(buffer: Float32Array, filename: string): Sound {
+    async getFeatures(buffer: Float32Array, filename: string): Promise<Sound> {
         let featureTracks: FeatureTracks = initialFeatureTracks();
         try {
             featureTracks = this.getFeatureTracks(buffer);
@@ -174,6 +214,8 @@ export default class FeatureExtractor {
         } catch (e) {
             throw new Error(`Error detecting pitch from '${filename}': ${e}`);
         }
+
+        result.instrument = await this.getInstrument(featureTracks);
 
         return result;
     }

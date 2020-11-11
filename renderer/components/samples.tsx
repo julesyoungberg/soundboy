@@ -1,8 +1,8 @@
 import React, { useEffect, useReducer, useState } from 'react';
-import { Text, Box, Button, Flex } from 'rebass';
+import { Text, Box, Flex } from 'rebass';
 import { Label, Select } from '@rebass/forms';
 
-import { Sound } from '../../@types';
+import { INSTRUMENTS } from '../../constants';
 import useAppState from '../hooks/useAppState';
 import useIpcService from '../hooks/useIpcService';
 import queries from '../queries';
@@ -19,7 +19,7 @@ const LABELS = {
 };
 
 const SELECT = {
-    instrument: ['Kick', 'Snare', 'Keys'],
+    instrument: INSTRUMENTS,
     pitch: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
 };
 
@@ -93,7 +93,7 @@ const Samples = () => {
 
     const getCounts = async () => {
         const getCount = async (key, opt) => {
-            if (!ipcService) return;
+            if (!ipcService) return 0;
             const query = filterToQuery({ ...filterState, [key]: opt });
             const count = await ipcService.getSoundsCount(query);
             setPage(1);
@@ -126,14 +126,14 @@ const Samples = () => {
 
     useEffect(() => {
         const updateCounts = async () => {
-            const counts = await getCounts();
-            setCounts(counts);
+            const c = await getCounts();
+            setCounts(c);
         };
         updateCounts();
     }, [filterState, ipcService]);
 
     const onUpdateFilterFactory = (filter: string) => async (event: any) => {
-        let value: string = 'All';
+        let value = 'All';
         if (typeof event === 'string') {
             value = event;
         } else if (event.target) {
