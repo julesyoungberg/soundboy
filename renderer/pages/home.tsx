@@ -11,10 +11,9 @@ import useAppState from '../hooks/useAppState';
 import useIpcService from '../hooks/useIpcService';
 import { MainAudioPlayer } from '../components/audio-player';
 
-function Home({ group }: { group?: string }) {
+function Home() {
     const { dispatch, state } = useAppState();
     const ipcService = useIpcService();
-    const showGroups = typeof group === 'undefined';
 
     const analyze = useCallback(
         async (folder) => {
@@ -66,16 +65,14 @@ function Home({ group }: { group?: string }) {
                             </Button>
                             <SelectFolder onChange={onSelect} />
                         </Box>
-                        {!showGroups && <MainAudioPlayer />}
+                        <MainAudioPlayer />
                     </Flex>
                 </Box>
                 <AnalyzerStatus />
-                <Samples sounds={state.sounds.data} />
+                <Samples />
             </div>
         </>
     );
 }
-
-Home.getInitialProps = ({ query }) => query;
 
 export default Home;

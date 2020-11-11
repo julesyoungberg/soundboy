@@ -71,7 +71,7 @@ const withWave = (Component) => {
             });
             return () => {
                 try {
-                    audio.stop();
+                    if (playing) audio.stop();
                 } catch (e) {
                     // The case this fails is when WaveSurfer
                     // tires to seek the audio to NaN.
