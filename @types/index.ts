@@ -42,6 +42,7 @@ export interface IpcResponse {
     error?: string;
     result?: Sound;
     results?: Sound[];
+    count?: number;
 }
 
 export interface AnalyzerMessage {

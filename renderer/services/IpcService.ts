@@ -91,6 +91,13 @@ export default class IpcService {
         dispatch({ type: 'fetch_sounds_response', payload: result });
         return result;
     }
+
+    async getSoundsCount(query: Record<string, any>) {
+        const result = await this.fetch('count_sounds', {
+            params: [query],
+        });
+        return result.count || 0;
+    }
 }
 
 export const IpcContext = React.createContext<IpcService | undefined>(undefined);

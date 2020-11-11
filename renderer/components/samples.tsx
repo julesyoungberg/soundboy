@@ -12,9 +12,23 @@ import Sample from './sample';
 import Stack from './stack';
 import List from './list';
 
+const LABELS = {
+    instrument: 'Instrument',
+    pitch: 'Pitch',
+};
+
+const SELECT = {
+    instrument: ['Kick', 'Snare', 'Keys'],
+    pitch: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+};
+
+const PAIRS = {
+    brightness: ['Bright', 'Dark'],
+};
+
 const GROUPS = {
-    Instrument: ['Kick', 'Snare', 'Keys'],
-    Pitch: ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'],
+    ...SELECT,
+    ...PAIRS,
 };
 
 export interface SoundsFilter {
@@ -22,6 +36,17 @@ export interface SoundsFilter {
     pitch: string;
     brightness: string;
     noisiness: string;
+}
+
+export interface GroupCount {
+    [key: string]: number;
+}
+
+export interface SoundsCount {
+    instrument?: GroupCount;
+    pitch?: GroupCount;
+    brightness?: GroupCount;
+    noisiness?: GroupCount;
 }
 
 const initialFilter = {
@@ -49,10 +74,13 @@ const filterToQuery = (filterState: SoundsFilter) =>
         };
     }, {});
 
-const Samples = ({ sounds = [] }: { sounds: Sound[] }) => {
+const Samples = () => {
     const [filterState, filterDispatch] = useReducer(filterReducer, initialFilter);
     const [header, setHeader] = useState<string>('');
-    const { dispatch } = useAppState();
+    const { state, dispatch } = useAppState();
+    const sounds = state.sounds.data;
+    const { running } = state.analyzer;
+    const hasSounds = sounds.length > 0;
     const ipcService = useIpcService();
 
     const getSounds = async (q: Partial<SoundsFilter> = {}) => {
@@ -62,9 +90,45 @@ const Samples = ({ sounds = [] }: { sounds: Sound[] }) => {
         await ipcService.getSounds(query, dispatch);
     };
 
+    const getCounts = async () => {
+        const getCount = async (key, opt) => {
+            if (!ipcService) return;
+            const query = filterToQuery({ ...filterState, [key]: opt });
+            const count = await ipcService.getSoundsCount(query);
+            return count;
+        };
+        const features = Object.keys(GROUPS);
+        const pairs = features.reduce((acc, feature) => {
+            const all = GROUPS[feature].map((value) => [feature, value]);
+            return acc.concat(all);
+        }, []);
+        const counts = {};
+        // Not a great implementation here since its essentially
+        // synchronous but the IPC event emitter returns the first response
+        // and returns the same result for all calls.
+        for (const [feature, value] of pairs) {
+            const count = await getCount(feature, value);
+            if (!counts[feature]) counts[feature] = {};
+            counts[feature][value] = count;
+        }
+        return counts;
+    };
+
+    const [counts, setCounts] = useState<SoundsCount>({});
+
     useEffect(() => {
-        getSounds();
-    }, []);
+        if (running) return;
+        getSounds(initialFilter);
+        filterDispatch(initialFilter);
+    }, [running]);
+
+    useEffect(() => {
+        const updateCounts = async () => {
+            const counts = await getCounts();
+            setCounts(counts);
+        };
+        updateCounts();
+    }, [filterState, ipcService]);
 
     const onUpdateFilterFactory = (filter: string) => async (event: any) => {
         let value: string = 'All';
@@ -77,33 +141,45 @@ const Samples = ({ sounds = [] }: { sounds: Sound[] }) => {
         filterDispatch(query);
         await getSounds(query);
     };
-
     return (
         <Flex sx={{ width: '100%' }}>
             <Stack>
                 <Flex>
-                    {Object.entries(GROUPS).map(([key, options]) => (
+                    {Object.entries(SELECT).map(([key, options]) => (
                         <Box key={key} width={1 / 2} style={{ padding: 10 }}>
-                            <Label htmlFor={key.toLowerCase()}>{key}</Label>
+                            <Label htmlFor={key}>{LABELS[key]}</Label>
                             <Select
-                                id={key.toLowerCase()}
+                                id={key}
                                 name={key}
-                                defaultValue='All'
-                                onChange={onUpdateFilterFactory(key.toLowerCase())}
+                                value={filterState[key]}
+                                onChange={onUpdateFilterFactory(key)}
+                                disabled={!hasSounds}
                             >
-                                {['All', ...options].map((opt) => (
-                                    <option key={opt}>{opt}</option>
-                                ))}
+                                {['All', ...options].map((opt) => {
+                                    const count = counts?.[key]?.[opt];
+                                    if (typeof count !== 'undefined' && count <= 0) return null;
+                                    return (
+                                        <option key={opt} value={opt}>
+                                            {opt} {!!count && `(${count})`}
+                                        </option>
+                                    );
+                                })}
                             </Select>
                         </Box>
                     ))}
                 </Flex>
-                <FilterPair
-                    current={filterState.brightness}
-                    option1='Bright'
-                    option2='Dark'
-                    onChange={onUpdateFilterFactory('brightness')}
-                />
+                {Object.entries(PAIRS).map(([key, [option1, option2]]) => (
+                    <FilterPair
+                        current={filterState[key]}
+                        key={key}
+                        option1={option1}
+                        option2={option2}
+                        option1Count={counts?.[key]?.[option1]}
+                        option2Count={counts?.[key]?.[option2]}
+                        onChange={onUpdateFilterFactory(key)}
+                        disabled={!hasSounds}
+                    />
+                ))}
             </Stack>
             <List title={header}>
                 <Stack>

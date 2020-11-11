@@ -35,6 +35,11 @@ class Sounds {
         return result as any;
     }
 
+    async count(query: Record<string, any>): Promise<number> {
+        const result = await this.db.count(query);
+        return result;
+    }
+
     async clear() {
         await this.db.remove({}, { multi: true });
     }
