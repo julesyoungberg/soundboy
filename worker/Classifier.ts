@@ -31,7 +31,7 @@ export default class Classifier {
     preprocess(raw: number[][]) {
         // make sure the mfcc vector is the right length
         const { n } = this;
-        let mfccs = raw;
+        const mfccs = raw;
         try {
             if (mfccs[0].length < n) {
                 const d = n - mfccs[0].length;

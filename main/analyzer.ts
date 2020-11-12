@@ -82,11 +82,11 @@ export default class Analyzer {
             }
 
             if (result.error) {
-                // weird bug coming from tensorflow when essentia is also loaded
                 let error = result.error;
                 if (typeof error === 'object') {
                     error = (error as any).message;
                 }
+                // weird bug coming from tensorflow when essentia is also loaded
                 if (error.includes('Variable with name conv2d/kernel was already registered')) {
                     return;
                 }

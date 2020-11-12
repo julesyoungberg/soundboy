@@ -55,7 +55,7 @@ function standardize(input: Float32Array) {
  */
 export default async function analyze(filename: string, testing?: boolean): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
-    
+
     if (!extractor.ready()) {
         await extractor.setup();
     }

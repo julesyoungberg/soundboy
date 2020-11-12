@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import fs from 'fs';
+// eslint-disable-next-line
 import Essentia from 'essentia.js/dist/core_api';
 import meyda from 'meyda/dist/node/main';
 
@@ -117,7 +118,7 @@ export default class FeatureExtractor {
         meyda.numberOfMFCCCoefficients = N_MFCCS;
         meyda.mellBands = 128;
         let prevFrame = new Float32Array(this.frameSize).fill(0);
-        const featureNames = this.features.filter(f => f !== 'mfcc');
+        const featureNames = this.features.filter((f) => f !== 'mfcc');
 
         // hop through buffer
         for (let offset = 0; offset < buffer.length; offset += this.hopSize) {
@@ -154,12 +155,13 @@ export default class FeatureExtractor {
                     this.frameSize, // window size
                     'hann', // window type
                     0, // zero padding
-                    undefined, // zero phase
+                    undefined // zero phase
                 );
 
                 const { spectrum } = this.essentia.Spectrum(frame, this.frameSize);
 
-                const { mfcc } = this.essentia.MFCC( // also returns bands
+                const { mfcc } = this.essentia.MFCC(
+                    // also returns bands
                     spectrum,
                     undefined, // dctType
                     undefined, // highFrequencyBound
@@ -241,7 +243,7 @@ export default class FeatureExtractor {
         const pathParts = filename.split('/');
         const f = pathParts[pathParts.length - 1].split(' ').join('_');
         // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
-    
+
         let featureTracks: FeatureTracks = initialFeatureTracks();
         try {
             featureTracks = this.getFeatureTracks(buffer);
