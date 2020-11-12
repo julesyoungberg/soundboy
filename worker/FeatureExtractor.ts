@@ -96,6 +96,8 @@ export default class FeatureExtractor {
     sampleRate = 22050;
     classifier: Classifier | undefined;
     essentia: Essentia | undefined;
+    meydaFeatures: Record<string, boolean> = {};
+    essentiaFeatures: Record<string, boolean> = {};
 
     constructor(config: FeatureExtractorOptions = {}) {
         if (config.features) this.features = config.features;
@@ -108,6 +110,14 @@ export default class FeatureExtractor {
             this.features = this.features.filter((feature) => feature !== 'instrument');
             this.classifier = new Classifier();
         }
+
+        this.features.forEach(feature => {
+            if (ESSENTIA_FEATURES.includes(feature)) {
+                this.essentiaFeatures[feature] = true;
+            } else {
+                this.meydaFeatures[feature] = true;
+            }
+        });
     }
 
     ready() {
@@ -168,9 +178,7 @@ export default class FeatureExtractor {
         meyda.numberOfMFCCCoefficients = N_MFCCS;
         meyda.mellBands = 128;
         let prevFrame = new Float32Array(this.frameSize).fill(0);
-        const meydaFeaturs = this.features.filter((f) => !ESSENTIA_FEATURES.includes(f));
-        console.log('essentia features', ESSENTIA_FEATURES);
-        console.log('meyda features', meydaFeaturs);
+        const meydaFeaturs = Object.keys(this.meydaFeatures);
 
         // use essentia to generate frames
         const frames = this.essentia.FrameGenerator(buffer, this.frameSize, this.hopSize);
@@ -181,58 +189,58 @@ export default class FeatureExtractor {
             const { spectrum } = this.essentia.Spectrum(frame, this.frameSize);
 
             // compute essentia features
-            if (this.features.includes('loudness')) {
+            if (this.essentiaFeatures['loudness']) {
                 const { loudness } = this.essentia.Loudness(frame);
                 results.loudness.push(loudness);
             }
 
-            if (this.features.includes('mfcc')) {
+            if (this.essentiaFeatures['mfcc']) {
                 const { mfcc } = this.getMFCC(spectrum);
                 results.mfcc.push(Array.from(this.essentia.vectorToArray(mfcc)));
             }
 
-            if (this.features.includes('rms')) {
+            if (this.essentiaFeatures['rms']) {
                 const { rms } = this.essentia.RMS(frame);
                 results.rms.push(rms);
             }
 
-            if (this.features.includes('spectralCentroid')) {
+            if (this.essentiaFeatures['spectralCentroid']) {
                 const { centroid } = this.essentia.Centroid(spectrum);
                 results.spectralCentroid.push(centroid);
             }
 
-            if (this.features.includes('spectralFlatness')) {
+            if (this.essentiaFeatures['spectralFlatness']) {
                 const { flatness } = this.essentia.FlatnessDB(spectrum);
                 results.spectralFlatness.push(flatness);
             }
 
-            if (this.features.includes('spectralFlux')) {
+            if (this.essentiaFeatures['spectralFlux']) {
                 const { flux } = this.essentia.Flux(spectrum);
                 results.spectralFlux.push(flux);
             }
 
-            if (this.features.includes('spectralRolloff')) {
+            if (this.essentiaFeatures['spectralRolloff']) {
                 const { rolloff } = this.essentia.RollOff(spectrum);
                 results.spectralRolloff.push(rolloff);
             }
 
             if (
-                this.features.includes('spectralSpread') ||
-                this.features.includes('spectralSkewness') ||
-                this.features.includes('spectralKurtosis')
+                this.essentiaFeatures['spectralSpread'] ||
+                this.essentiaFeatures['spectralSkewness'] ||
+                this.essentiaFeatures['spectralKurtosis']
             ) {
                 const { centralMoments } = this.essentia.CentralMoments(spectrum);
                 const { kurtosis, skewness, spread } = this.essentia.DistributionShape(centralMoments);
 
-                if (this.features.includes('spectralSpread')) {
+                if (this.essentiaFeatures['spectralSpread']) {
                     results.spectralSpread.push(spread);
                 }
 
-                if (this.features.includes('spectralSkewness')) {
+                if (this.essentiaFeatures['spectralSkewness']) {
                     results.spectralSkewness.push(skewness);
                 }
 
-                if (this.features.includes('spectralKurtosis')) {
+                if (this.essentiaFeatures['spectralKurtosis']) {
                     results.spectralKurtosis.push(kurtosis);
                 }
             }

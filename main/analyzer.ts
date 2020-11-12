@@ -11,7 +11,7 @@ const NUM_WORKERS = Math.ceil(os.cpus().length);
 
 function createWorkerWindow() {
     const window = new BrowserWindow({
-        //show: false,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
         },
