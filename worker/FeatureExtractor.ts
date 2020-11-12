@@ -111,7 +111,7 @@ export default class FeatureExtractor {
             this.classifier = new Classifier();
         }
 
-        this.features.forEach(feature => {
+        this.features.forEach((feature) => {
             if (ESSENTIA_FEATURES.includes(feature)) {
                 this.essentiaFeatures[feature] = true;
             } else {
