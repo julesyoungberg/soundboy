@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import fs from 'fs';
+// import fs from 'fs';
 // eslint-disable-next-line
 import Essentia from 'essentia.js/dist/core_api';
 import meyda from 'meyda/dist/node/main';
@@ -17,7 +17,7 @@ const FEATURES = [
     'rms',
     'spectralCentroid',
     'spectralFlatness',
-    // 'spectralFlux', // breaks meyda - is supported by essentia
+    'spectralFlux', // breaks meyda - is supported by essentia
     'spectralSlope',
     'spectralRolloff',
     'spectralSpread',
@@ -29,16 +29,16 @@ const FEATURES = [
 ];
 
 const ESSENTIA_FEATURES = [
-    // 'loudness',
+    'loudness',
     'mfcc',
-    // 'rms',
-    // 'spectralCentroid',
-    // 'spectralFlatness',
-    // 'spectralFlux',
-    // 'spectralRolloff',
-    // 'spectralSpread',
-    // 'spectralSkewness',
-    // 'spectralKurtosis',
+    'rms',
+    'spectralCentroid',
+    'spectralFlatness',
+    'spectralFlux',
+    'spectralRolloff',
+    'spectralSpread',
+    'spectralSkewness',
+    'spectralKurtosis',
 ];
 
 const PITCHES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -181,76 +181,70 @@ export default class FeatureExtractor {
             const { spectrum } = this.essentia.Spectrum(frame, this.frameSize);
 
             // compute essentia features
-            // console.log('essentia features');
-            // if (this.features.includes('loudness')) {
-            //     const { loudness } = this.essentia.Loudness(frame);
-            //     results.loudness.push(loudness);
-            // }
+            if (this.features.includes('loudness')) {
+                const { loudness } = this.essentia.Loudness(frame);
+                results.loudness.push(loudness);
+            }
 
             if (this.features.includes('mfcc')) {
                 const { mfcc } = this.getMFCC(spectrum);
                 results.mfcc.push(Array.from(this.essentia.vectorToArray(mfcc)));
             }
 
-            // if (this.features.includes('rms')) {
-            //     const { rms } = this.essentia.RMS(frame);
-            //     results.rms.push(rms);
-            // }
+            if (this.features.includes('rms')) {
+                const { rms } = this.essentia.RMS(frame);
+                results.rms.push(rms);
+            }
 
-            // if (this.features.includes('spectralCentroid')) {
-            //     const { centroid } = this.essentia.Centroid(spectrum);
-            //     results.spectralCentroid.push(centroid);
-            // }
+            if (this.features.includes('spectralCentroid')) {
+                const { centroid } = this.essentia.Centroid(spectrum);
+                results.spectralCentroid.push(centroid);
+            }
 
-            // if (this.features.includes('spectralFlatness')) {
-            //     const { flatness } = this.essentia.FlatnessDB(spectrum);
-            //     results.spectralFlatness.push(flatness);
-            // }
+            if (this.features.includes('spectralFlatness')) {
+                const { flatness } = this.essentia.FlatnessDB(spectrum);
+                results.spectralFlatness.push(flatness);
+            }
 
-            // if (this.features.includes('spectralFlux')) {
-            //     const { flux } = this.essentia.Flux(spectrum);
-            //     results.spectralFlux.push(flux);
-            // }
+            if (this.features.includes('spectralFlux')) {
+                const { flux } = this.essentia.Flux(spectrum);
+                results.spectralFlux.push(flux);
+            }
 
-            // if (this.features.includes('spectralRolloff')) {
-            //     const { rolloff } = this.essentia.RollOff(spectrum);
-            //     results.spectralRolloff.push(rolloff);
-            // }
+            if (this.features.includes('spectralRolloff')) {
+                const { rolloff } = this.essentia.RollOff(spectrum);
+                results.spectralRolloff.push(rolloff);
+            }
 
-            // if (this.features.includes('spectralSpread') || this.features.includes('spectralSkewness') || this.features.includes('spectralKurtosis')) {
-            //     const { centralMoments } = this.essentia.CentralMoments(spectrum);
-            //     const { kurtosis, skewness, spread } = this.essentia.DistributionShape(centralMoments);
+            if (
+                this.features.includes('spectralSpread') ||
+                this.features.includes('spectralSkewness') ||
+                this.features.includes('spectralKurtosis')
+            ) {
+                const { centralMoments } = this.essentia.CentralMoments(spectrum);
+                const { kurtosis, skewness, spread } = this.essentia.DistributionShape(centralMoments);
 
-            //     if (this.features.includes('spectralSpread')) {
-            //         results.spectralSpread.push(spread);
-            //     }
+                if (this.features.includes('spectralSpread')) {
+                    results.spectralSpread.push(spread);
+                }
 
-            //     if (this.features.includes('spectralSkewness')) {
-            //         results.spectralSkewness.push(skewness);
-            //     }
+                if (this.features.includes('spectralSkewness')) {
+                    results.spectralSkewness.push(skewness);
+                }
 
-            //     if (this.features.includes('spectralKurtosis')) {
-            //         results.spectralKurtosis.push(kurtosis);
-            //     }
-            // }
+                if (this.features.includes('spectralKurtosis')) {
+                    results.spectralKurtosis.push(kurtosis);
+                }
+            }
 
             // meyda features
-            // console.log('meyda features');
             if (meydaFeaturs.length > 0) {
                 const samples = this.essentia.vectorToArray(frames.get(i));
-                try {
-                    const features = meyda.extract(meydaFeaturs, samples, prevFrame);
-                    prevFrame = samples;
-                    Object.keys(features).forEach((feature) => {
-                        results[feature]?.push(features[feature]);
-                    });
-                } catch (e) {
-                    // TODO fix: prevent error preferably - otherwise handle somehow
-                    console.log(e);
-                    meydaFeaturs.forEach((feature) => {
-                        results[feature]?.push(0);
-                    });
-                }
+                const features = meyda.extract(meydaFeaturs, samples, prevFrame);
+                prevFrame = samples;
+                Object.keys(features).forEach((feature) => {
+                    results[feature]?.push(features[feature]);
+                });
             }
         }
 
@@ -313,8 +307,8 @@ export default class FeatureExtractor {
      * @param buffer
      */
     async getFeatures(buffer: Float32Array, filename: string): Promise<Sound> {
-        const pathParts = filename.split('/');
-        const f = pathParts[pathParts.length - 1].split(' ').join('_');
+        // const pathParts = filename.split('/');
+        // const f = pathParts[pathParts.length - 1].split(' ').join('_');
         // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
 
         console.log('computing features');
@@ -354,7 +348,7 @@ export default class FeatureExtractor {
             for (let i = 0; i < N_MFCCS; i++) {
                 mfccs.push(Array.from(mfccData.subarray(i * nFrames, (i + 1) * nFrames)));
             }
-            fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
+            // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
             result.instrument = await this.getInstrument(mfccs);
         }
 
