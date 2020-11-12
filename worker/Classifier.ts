@@ -33,13 +33,17 @@ export default class Classifier {
         const { n } = this;
         let mfccs = raw;
         try {
-            if (mfccs.length < n) {
-                const d = n - mfccs.length;
-                for (let i = 0; i < d; i++) {
-                    mfccs.push(new Array(mfccs[0].length).fill(0));
+            if (mfccs[0].length < n) {
+                const d = n - mfccs[0].length;
+                for (let m = 0; m < N_MFCCS; m++) {
+                    for (let i = 0; i < d; i++) {
+                        mfccs[m].push(0);
+                    }
                 }
-            } else if (mfccs.length > n) {
-                mfccs = mfccs.slice(0, n);
+            } else if (mfccs[0].length > n) {
+                for (let m = 0; m < N_MFCCS; m++) {
+                    mfccs[m] = mfccs[m].slice(0, n);
+                }
             }
         } catch (e) {
             throw new Error(`Error standardizing mfcc vector length: ${e}`);

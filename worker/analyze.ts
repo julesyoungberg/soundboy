@@ -4,14 +4,15 @@ import FeatureExtractor from './FeatureExtractor';
 import loadSoundFile from './loadSoundFile';
 import trimSamples from './trimSamples';
 
-const SAMPLE_RATE = 22050;
-const FRAME_SIZE = 2048;
-const HOP_SIZE = 1024;
-const MAX_CLIP_LENGTH = 5; // seconds
+export const SAMPLE_RATE = 22050;
+export const FRAME_SIZE = 2048;
+export const HOP_SIZE = 1024;
+export const MAX_CLIP_LENGTH = 5; // seconds
 
 const extractor = new FeatureExtractor({
     frameSize: FRAME_SIZE,
     hopSize: HOP_SIZE,
+    sampleRate: SAMPLE_RATE,
 });
 
 /**

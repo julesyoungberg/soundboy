@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
+import fs from 'fs';
 import meyda from 'meyda/dist/node/main';
 
 import { ArrayFeature, Feature, Sound } from '../@types';
@@ -31,6 +32,7 @@ interface FeatureExtractorOptions {
     features?: string[];
     frameSize?: number;
     hopSize?: number;
+    sampleRate?: number;
 }
 
 interface FeatureTracks {
@@ -76,12 +78,14 @@ export default class FeatureExtractor {
     features: string[] = FEATURES;
     frameSize = 2048;
     hopSize = 1024;
+    sampleRate = 22050;
     classifier: Classifier | undefined;
 
     constructor(config: FeatureExtractorOptions = {}) {
         if (config.features) this.features = config.features;
         if (config.frameSize) this.frameSize = config.frameSize;
         if (config.hopSize) this.hopSize = config.hopSize;
+        if (config.sampleRate) this.sampleRate = config.sampleRate;
 
         if (this.features.includes('instrument')) {
             // this.features should only contain meyda features
@@ -101,8 +105,10 @@ export default class FeatureExtractor {
     getFeatureTracks(buffer: Float32Array): FeatureTracks {
         const results = initialFeatureTracks();
         meyda.bufferSize = this.frameSize;
+        meyda.sampleRate = this.sampleRate;
         meyda.numberOfMFCCCoefficients = N_MFCCS;
-        let prevFrame = new Float32Array();
+        meyda.mellBands = 128;
+        let prevFrame = new Float32Array(this.frameSize).fill(0);
 
         // hop through buffer
         for (let offset = 0; offset < buffer.length; offset += this.hopSize) {
@@ -165,10 +171,10 @@ export default class FeatureExtractor {
 
     /**
      * High level classification algorithm
-     * @param featureTracks
+     * @param mfccs
      */
-    async getInstrument({ mfcc }: FeatureTracks): Promise<string | undefined> {
-        if (!(this.classifier && mfcc && mfcc.length > 0)) {
+    async getInstrument(mfccs: number[][]): Promise<string | undefined> {
+        if (!(this.classifier && mfccs && mfccs.length > 0)) {
             return undefined;
         }
 
@@ -181,7 +187,7 @@ export default class FeatureExtractor {
             throw new Error(`Error loading classification model: ${e}`);
         }
 
-        const instrument = await this.classifier.classify(mfcc);
+        const instrument = await this.classifier.classify(mfccs);
         return instrument;
     }
 
@@ -190,6 +196,10 @@ export default class FeatureExtractor {
      * @param buffer
      */
     async getFeatures(buffer: Float32Array, filename: string): Promise<Sound> {
+        const pathParts = filename.split('/');
+        const f = pathParts[pathParts.length - 1].split(' ').join('_');
+        //fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
+    
         let featureTracks: FeatureTracks = initialFeatureTracks();
         try {
             featureTracks = this.getFeatureTracks(buffer);
@@ -215,7 +225,18 @@ export default class FeatureExtractor {
             throw new Error(`Error detecting pitch from '${filename}': ${e}`);
         }
 
-        result.instrument = await this.getInstrument(featureTracks);
+        if (featureTracks.mfcc) {
+            let mt = tf.tensor2d(featureTracks.mfcc);
+            mt = mt.transpose();
+            const mfccData = mt.dataSync();
+            const mfccs = [];
+            const nFrames = mfccData.length / N_MFCCS;
+            for (let i = 0; i < N_MFCCS; i++) {
+                mfccs.push(Array.from(mfccData.subarray(i * nFrames, (i + 1) * nFrames)));
+            }
+            fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
+            result.instrument = await this.getInstrument(mfccs);
+        }
 
         return result;
     }
