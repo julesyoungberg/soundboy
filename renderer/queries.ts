@@ -1,6 +1,6 @@
 export default {
-    instrument(value: string) {
-        return {};
+    instrument(instrument: string) {
+        return { instrument };
     },
     pitch(pitch: string) {
         return { pitch };

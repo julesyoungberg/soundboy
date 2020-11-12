@@ -12,7 +12,7 @@ describe('trimSamples', () => {
         console.log('loading sound file', filename);
         const buffer = await loadSoundFile(path.resolve(__dirname, `./sounds/${filename}`));
         console.log(`trimming samples for ${filename}: ${buffer.length} samples`);
-        const samples = trimSamples(buffer);
+        const samples = await trimSamples(buffer);
         console.log(
             `trimmed result for ${filename}: ${samples.length} samples (${samples[0]}, ${samples[samples.length - 1]}`
         );
