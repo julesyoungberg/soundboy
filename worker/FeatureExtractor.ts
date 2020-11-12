@@ -1,5 +1,6 @@
 import * as tf from '@tensorflow/tfjs';
 import fs from 'fs';
+import Essentia from 'essentia.js/dist/core_api';
 import meyda from 'meyda/dist/node/main';
 
 import { ArrayFeature, Feature, Sound } from '../@types';
@@ -80,6 +81,7 @@ export default class FeatureExtractor {
     hopSize = 1024;
     sampleRate = 22050;
     classifier: Classifier | undefined;
+    essentia: Essentia | undefined;
 
     constructor(config: FeatureExtractorOptions = {}) {
         if (config.features) this.features = config.features;
@@ -94,7 +96,13 @@ export default class FeatureExtractor {
         }
     }
 
+    ready() {
+        return !!this.essentia && this.classifier.ready();
+    }
+
     async setup() {
+        const essentiaWASM = await (window as any).EssentiaWASM();
+        this.essentia = new (window as any).Essentia(essentiaWASM);
         await this.classifier?.setup();
     }
 
@@ -109,6 +117,7 @@ export default class FeatureExtractor {
         meyda.numberOfMFCCCoefficients = N_MFCCS;
         meyda.mellBands = 128;
         let prevFrame = new Float32Array(this.frameSize).fill(0);
+        const featureNames = this.features.filter(f => f !== 'mfcc');
 
         // hop through buffer
         for (let offset = 0; offset < buffer.length; offset += this.hopSize) {
@@ -117,7 +126,8 @@ export default class FeatureExtractor {
             const frame = new Float32Array(this.frameSize).fill(0);
             frame.set(buffer.slice(offset, end));
 
-            const features = meyda.extract(this.features, frame, prevFrame);
+            // skip mfcc for meyda
+            const features = meyda.extract(featureNames, frame, prevFrame);
             prevFrame = frame;
 
             // push features to appropriate tracks
@@ -130,6 +140,47 @@ export default class FeatureExtractor {
                     results[feature]?.push(val);
                 }
             });
+        }
+
+        // use essentia to compute mfccs
+        if (this.features.includes('mfcc')) {
+            const frames = this.essentia.FrameGenerator(buffer, this.frameSize, this.hopSize);
+            const mfccs = [];
+
+            for (let i = 0; i < frames.size(); i++) {
+                const { frame } = this.essentia.Windowing(
+                    frames.get(i),
+                    undefined, // normalized
+                    this.frameSize, // window size
+                    'hann', // window type
+                    0, // zero padding
+                    undefined, // zero phase
+                );
+
+                const { spectrum } = this.essentia.Spectrum(frame, this.frameSize);
+
+                const { mfcc } = this.essentia.MFCC( // also returns bands
+                    spectrum,
+                    undefined, // dctType
+                    undefined, // highFrequencyBound
+                    undefined, // inputSize
+                    undefined, // liftering
+                    undefined, // logType
+                    undefined, // lowFrequencyBound
+                    undefined, // normalize
+                    128, // numberBands?: number,
+                    N_MFCCS, // numberCoefficients?: number,
+                    this.sampleRate, // sampleRate?: number,
+                    undefined, // silenceThreshold?: number,
+                    undefined, // type?: string,
+                    undefined, // warpingFormula?:
+                    undefined // string, weighting?: string
+                );
+
+                mfccs.push(Array.from(this.essentia.vectorToArray(mfcc)));
+            }
+
+            results.mfcc = mfccs;
         }
 
         return results;
@@ -178,15 +229,6 @@ export default class FeatureExtractor {
             return undefined;
         }
 
-        try {
-            // lazily setup classifier
-            if (!this.classifier.ready()) {
-                await this.classifier.setup();
-            }
-        } catch (e) {
-            throw new Error(`Error loading classification model: ${e}`);
-        }
-
         const instrument = await this.classifier.classify(mfccs);
         return instrument;
     }
@@ -196,9 +238,9 @@ export default class FeatureExtractor {
      * @param buffer
      */
     async getFeatures(buffer: Float32Array, filename: string): Promise<Sound> {
-        // const pathParts = filename.split('/');
-        // const f = pathParts[pathParts.length - 1].split(' ').join('_');
-        //fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
+        const pathParts = filename.split('/');
+        const f = pathParts[pathParts.length - 1].split(' ').join('_');
+        // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
     
         let featureTracks: FeatureTracks = initialFeatureTracks();
         try {
@@ -225,7 +267,7 @@ export default class FeatureExtractor {
             throw new Error(`Error detecting pitch from '${filename}': ${e}`);
         }
 
-        if (featureTracks.mfcc) {
+        if (featureTracks.mfcc && this.classifier) {
             let mt = tf.tensor2d(featureTracks.mfcc);
             mt = mt.transpose();
             const mfccData = mt.dataSync();
@@ -234,7 +276,7 @@ export default class FeatureExtractor {
             for (let i = 0; i < N_MFCCS; i++) {
                 mfccs.push(Array.from(mfccData.subarray(i * nFrames, (i + 1) * nFrames)));
             }
-            // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
+            fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
             result.instrument = await this.getInstrument(mfccs);
         }
 
