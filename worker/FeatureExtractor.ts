@@ -111,7 +111,7 @@ export default class FeatureExtractor {
     }
 
     ready() {
-        return !!this.essentia && this.classifier.ready();
+        return !!this.essentia && (!this.classifier || this.classifier.ready());
     }
 
     async setup() {
