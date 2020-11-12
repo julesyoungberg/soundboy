@@ -9,7 +9,7 @@ export default {
     brightness(value: string) {
         switch (value) {
             case 'Bright':
-                return { 'spectralCentroid.mean': { $gte: 400 } };
+                return { 'spectralCentroid.mean': { $gte: 200 } };
             case 'Dark':
                 return { 'spectralCentroid.mean': { $lte: 200 } };
             default:
