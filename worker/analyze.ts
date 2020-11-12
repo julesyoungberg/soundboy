@@ -56,12 +56,19 @@ function standardize(input: Float32Array) {
 export default async function analyze(filename: string, testing?: boolean): Promise<Sound> {
     console.log('Analyze Worker - filename: ', filename);
 
-    if (!extractor.ready()) {
-        await extractor.setup();
+    let buffer = await loadSoundFile(filename, testing ? undefined : SAMPLE_RATE);
+
+    try {
+        buffer = await trimSamples(buffer);
+    } catch (e) {
+        throw new Error(`Error trimming samples: ${e}`);
     }
 
-    let buffer = await loadSoundFile(filename, testing ? undefined : SAMPLE_RATE);
-    buffer = standardize(trimSamples(buffer));
+    try {
+        buffer = standardize(buffer);
+    } catch (e) {
+        throw new Error(`Error standardizing sample length: ${e}`);
+    }
 
     const result = await extractor.getFeatures(buffer, filename);
     return result;

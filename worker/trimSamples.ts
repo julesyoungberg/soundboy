@@ -29,8 +29,8 @@ export function trimStart(input: Float32Array) {
  * trim silence from the start and end of the input buffer
  * @param input
  */
-export default function trimSamples(input: Float32Array) {
-    const { rms } = extractor.getFeatureTracks(input);
+export default async function trimSamples(input: Float32Array) {
+    const { rms } = await extractor.getFeatureTracks(input);
 
     const mse = rms.map((v) => v * v);
     const t = tf.tensor(mse);
