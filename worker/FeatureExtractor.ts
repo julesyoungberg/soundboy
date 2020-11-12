@@ -220,7 +220,7 @@ export default class FeatureExtractor {
             }
 
             if (this.essentiaFeatures['spectralRolloff']) {
-                const { rolloff } = this.essentia.RollOff(spectrum);
+                const { rolloff } = this.essentia.RollOff(spectrum, undefined, this.sampleRate);
                 results.spectralRolloff.push(rolloff);
             }
 
