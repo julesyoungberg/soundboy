@@ -196,8 +196,8 @@ export default class FeatureExtractor {
      * @param buffer
      */
     async getFeatures(buffer: Float32Array, filename: string): Promise<Sound> {
-        const pathParts = filename.split('/');
-        const f = pathParts[pathParts.length - 1].split(' ').join('_');
+        // const pathParts = filename.split('/');
+        // const f = pathParts[pathParts.length - 1].split(' ').join('_');
         //fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
     
         let featureTracks: FeatureTracks = initialFeatureTracks();
@@ -234,7 +234,7 @@ export default class FeatureExtractor {
             for (let i = 0; i < N_MFCCS; i++) {
                 mfccs.push(Array.from(mfccData.subarray(i * nFrames, (i + 1) * nFrames)));
             }
-            fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
+            // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
             result.instrument = await this.getInstrument(mfccs);
         }
 
