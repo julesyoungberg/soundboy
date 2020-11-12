@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
-import { Box, Button, Flex } from 'rebass';
+import { Text, Box, Button, Flex } from 'rebass';
 import { Label, Select } from '@rebass/forms';
 
 import { Sound } from '../../@types';
@@ -8,9 +8,10 @@ import useIpcService from '../hooks/useIpcService';
 import queries from '../queries';
 
 import FilterPair from './filter-pair';
-import Sample from './sample';
 import Stack from './stack';
 import List from './list';
+import Card from './card';
+import { RiSoundModuleFill } from 'react-icons/ri';
 
 const LABELS = {
     instrument: 'Instrument',
@@ -76,7 +77,7 @@ const filterToQuery = (filterState: SoundsFilter) =>
 
 const Samples = () => {
     const [filterState, filterDispatch] = useReducer(filterReducer, initialFilter);
-    const [header, setHeader] = useState<string>('');
+    const [page, setPage] = useState<number>(1);
     const { state, dispatch } = useAppState();
     const sounds = state.sounds.data;
     const { running } = state.analyzer;
@@ -95,6 +96,7 @@ const Samples = () => {
             if (!ipcService) return;
             const query = filterToQuery({ ...filterState, [key]: opt });
             const count = await ipcService.getSoundsCount(query);
+            setPage(1);
             return count;
         };
         const features = Object.keys(GROUPS);
@@ -143,51 +145,54 @@ const Samples = () => {
     };
     return (
         <Flex sx={{ width: '100%' }}>
-            <Stack>
-                <Flex>
-                    {Object.entries(SELECT).map(([key, options]) => (
-                        <Box key={key} width={1 / 2} style={{ padding: 10 }}>
-                            <Label htmlFor={key}>{LABELS[key]}</Label>
-                            <Select
-                                id={key}
-                                name={key}
-                                value={filterState[key]}
-                                onChange={onUpdateFilterFactory(key)}
-                                disabled={!hasSounds}
-                            >
-                                {['All', ...options].map((opt) => {
-                                    const count = counts?.[key]?.[opt];
-                                    if (typeof count !== 'undefined' && count <= 0) return null;
-                                    return (
-                                        <option key={opt} value={opt}>
-                                            {opt} {!!count && `(${count})`}
-                                        </option>
-                                    );
-                                })}
-                            </Select>
-                        </Box>
-                    ))}
+            <Stack marginLeft={2}>
+                <Flex justifyContent='space-between' marginTop={2} marginBottom={2} px={3} py={4}>
+                    <Text color='black' fontWeight='bold' fontSize={[3, 4]} paddingTop={2}>
+                        <Flex alignItems='center' sx={{ '> svg': { marginLeft: '11px' } }}>
+                            Filters <RiSoundModuleFill size='27px' />
+                        </Flex>
+                    </Text>
                 </Flex>
-                {Object.entries(PAIRS).map(([key, [option1, option2]]) => (
-                    <FilterPair
-                        current={filterState[key]}
-                        key={key}
-                        option1={option1}
-                        option2={option2}
-                        option1Count={counts?.[key]?.[option1]}
-                        option2Count={counts?.[key]?.[option2]}
-                        onChange={onUpdateFilterFactory(key)}
-                        disabled={!hasSounds}
-                    />
-                ))}
-            </Stack>
-            <List title={header}>
-                <Stack>
-                    {sounds.map((sound) => (
-                        <Sample sound={sound} key={sound._id} />
+                <Card>
+                    <Flex>
+                        {Object.entries(SELECT).map(([key, options]) => (
+                            <Box key={key} width={1 / 2} style={{ padding: 10 }}>
+                                <Label htmlFor={key}>{LABELS[key]}</Label>
+                                <Select
+                                    id={key}
+                                    name={key}
+                                    value={filterState[key]}
+                                    onChange={onUpdateFilterFactory(key)}
+                                    disabled={!hasSounds}
+                                >
+                                    {['All', ...options].map((opt) => {
+                                        const count = counts?.[key]?.[opt];
+                                        if (typeof count !== 'undefined' && count <= 0) return null;
+                                        return (
+                                            <option key={opt} value={opt}>
+                                                {opt} {!!count && `(${count})`}
+                                            </option>
+                                        );
+                                    })}
+                                </Select>
+                            </Box>
+                        ))}
+                    </Flex>
+                    {Object.entries(PAIRS).map(([key, [option1, option2]]) => (
+                        <FilterPair
+                            current={filterState[key]}
+                            key={key}
+                            option1={option1}
+                            option2={option2}
+                            option1Count={counts?.[key]?.[option1]}
+                            option2Count={counts?.[key]?.[option2]}
+                            onChange={onUpdateFilterFactory(key)}
+                            disabled={!hasSounds}
+                        />
                     ))}
-                </Stack>
-            </List>
+                </Card>
+            </Stack>
+            <List title='Samples' sounds={sounds} page={page} onPageChange={setPage} />
         </Flex>
     );
 };

@@ -17,11 +17,13 @@ const Clickable = ({
     href,
     onClick,
     className,
+    disabled,
 }: {
     children: React.ReactNode;
     href?: Url;
     onClick?: () => void;
     className?: string;
+    disabled?: boolean;
 }) => {
     const isLink = typeof href !== 'undefined';
     const isButton = typeof onClick === 'function';
@@ -29,7 +31,7 @@ const Clickable = ({
         return <div className={className}>{children}</div>;
     }
     const Wrapper = isLink ? Link : Button;
-    const props = isLink ? { href } : { onClick };
+    const props = isLink ? { href } : { disabled, onClick };
     return <Wrapper {...props}>{children}</Wrapper>;
 };
 

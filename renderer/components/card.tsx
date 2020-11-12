@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Heading } from 'rebass';
 import Clickable from './clickable';
 import type { Url } from '../../@types';
+import useTheme from '../hooks/useTheme';
 
 const Card = ({
     title,
@@ -18,6 +19,7 @@ const Card = ({
     children?: React.ReactNode;
     className?: string;
 }) => {
+    const theme = useTheme();
     let activeStyle = {};
     const clickable = typeof href !== 'undefined' || typeof onClick === 'function';
     if (clickable) {
@@ -31,7 +33,7 @@ const Card = ({
         borderWidth: '1px',
         borderColor: 'grey',
         borderStyle: 'solid',
-        boxShadow: '-4px 4px 50px -12px rgb(185 185 185 / 56%)',
+        boxShadow: theme.shadows.normal,
         '&:active': {
             ...activeStyle,
         },

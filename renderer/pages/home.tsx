@@ -3,7 +3,6 @@ import Head from 'next/head';
 import { Button, Flex, Box } from 'rebass';
 
 import Header from '../components/header';
-import AnalyzerStatus from '../components/analyzer-status';
 import SelectFolder from '../components/select-folder';
 import Samples from '../components/samples';
 import Groups from '../components/groups';
@@ -68,7 +67,6 @@ function Home() {
                         <MainAudioPlayer />
                     </Flex>
                 </Box>
-                <AnalyzerStatus />
                 <Samples />
             </div>
         </>

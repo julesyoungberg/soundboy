@@ -19,7 +19,7 @@ const Position = styled.div`
 `;
 
 const Header = () => (
-    <Heading fontSize={[7, 8]} color='black' fontStyle='italic' fontWeight='800'>
+    <Heading sx={{ userSelect: 'none' }} fontSize={[7, 8]} color='black' fontStyle='italic' fontWeight='800'>
         <Flex sx={{ position: 'relative' }} alignItems='center'>
             <Box sx={{ letterSpacing: '-10px' }}>Soundboy</Box>
             <Box width='150px' sx={{ position: 'relative' }}>

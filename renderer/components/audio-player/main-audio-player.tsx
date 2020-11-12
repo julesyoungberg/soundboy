@@ -33,7 +33,7 @@ const MainAudioPlayer = () => {
     if (!nowPlaying || !nowPlaying.sound) return null;
     const filename = getFileName(nowPlaying.sound.filename);
     return (
-        <Box sx={{ flex: '1', minWidth: '200px', marginTop: 3, marginBottom: 4 }}>
+        <Box sx={{ flex: '1', minWidth: '200px', marginTop: 3 }}>
             <Card>
                 <Text mx={1} my={2} color='black' fontWeight='bold' fontSize={[1, 2]}>
                     {filename}

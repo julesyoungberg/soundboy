@@ -12,6 +12,7 @@ import theme from '../theme';
 const global = css`
     body {
         background: ${theme.colors.background};
+        margin: 0;
     }
 `;
 
