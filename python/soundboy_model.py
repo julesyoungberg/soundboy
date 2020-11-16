@@ -14,10 +14,6 @@ features = np.load('features.npy')
 mfccs = np.load('mfccs.npy')
 labels = np.load('labels.npy')
 
-#X_mfccs = np.array(mfccs.tolist())
-#X_features = np.array(features.tolist())
-#y = np.array(labels.tolist())
-
 
 le = LabelEncoder()
 
@@ -28,7 +24,7 @@ from sklearn.model_selection import train_test_split
 x_train, x_test, y_train, y_test = train_test_split(mfccs, yy, test_size=0.2, random_state=42)
 
 num_rows = 40
-num_columns = 108
+num_columns = 109
 num_channels = 1
 
 print(x_train.shape[0], x_train.shape)
@@ -98,4 +94,4 @@ print("Training Accuracy: ", score[1])
 score = model.evaluate(x_test, y_test, verbose=0)
 print("Testing Accuracy: ", score[1])
 
-model.save('saved_models/soundboy_model.h5')
+model.save('saved_models/soundboy_model_essentia.h5')
