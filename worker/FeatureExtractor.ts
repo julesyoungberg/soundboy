@@ -14,11 +14,12 @@ const FEATURES = [
     'loudness',
     'mfcc',
     'perceptualSpread',
+    'perceptualSharpness',
     'rms',
     'spectralCentroid',
     'spectralFlatness',
     'spectralFlux', // breaks meyda - is supported by essentia
-    'spectralSlope',
+    // 'spectralSlope',
     'spectralRolloff',
     'spectralSpread',
     'spectralSkewness',
