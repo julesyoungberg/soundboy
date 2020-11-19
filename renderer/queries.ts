@@ -1,3 +1,6 @@
+/**
+ * This file defines the UI filters and their corresponding DB queries 
+ */
 export default {
     brightness(value: string) {
         const mid = 200;
