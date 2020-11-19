@@ -27,12 +27,14 @@ const StyledHeading = styled(Heading)`
 
 const Errors = styled(Box)`
     padding-bottom: 10px;
-    overflow-x: scroll;
+    height: 200px;
+    overflow: scroll;
 `;
 
 const ErrorMessage = styled.div<{ color?: string }>`
     margin-top: 10px;
     width: 100%;
+    font-size: 13px;
     color: ${(props) => props.color};
 `;
 
@@ -51,9 +53,14 @@ export default function AnalyzerStatus() {
 
     let headerContent: ReactNode | undefined;
     if (analyzer.running) {
+        let latest = analyzer.latest || '';
+        if (latest && analyzer.folder) {
+            latest = latest.replace(analyzer.folder, '');
+        }
+
         headerContent = (
             <ProgressContainer>
-                <small>Analyzing... {analyzer.latest || ''}</small>
+                <small>Analyzing... {latest}</small>
                 <Line percent={percent} strokeColor={theme.colors.secondary} />
             </ProgressContainer>
         );
@@ -81,8 +88,8 @@ export default function AnalyzerStatus() {
             {headerContent}
             {analyzer.errors.length > 0 && (
                 <Errors>
-                    {analyzer.errors.map((error) => (
-                        <ErrorMessage key={error.message}>{error.message}</ErrorMessage>
+                    {analyzer.errors.map((error, i) => (
+                        <ErrorMessage key={`${i}:${error.message}`}>{error.message}</ErrorMessage>
                     ))}
                 </Errors>
             )}

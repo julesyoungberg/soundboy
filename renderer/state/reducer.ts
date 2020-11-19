@@ -20,6 +20,7 @@ function startAnalyzer(state: State, action: Action): State {
         analyzer: {
             completed: 0,
             errors: [],
+            folder: action.payload.folder,
             running: true,
             tasks: action.payload.soundfiles,
         },

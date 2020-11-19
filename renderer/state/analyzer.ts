@@ -9,6 +9,7 @@ export interface AnalyzerError {
 export interface AnalyzerState {
     completed: number;
     errors: AnalyzerError[];
+    folder?: string;
     latest?: string;
     running: boolean;
     tasks: string[];
