@@ -1,5 +1,5 @@
 /**
- * This file defines the UI filters and their corresponding DB queries 
+ * This file defines the UI filters and their corresponding DB queries
  */
 export default {
     brightness(value: string) {
@@ -92,5 +92,5 @@ export default {
             default:
                 return {};
         }
-    }
+    },
 };
