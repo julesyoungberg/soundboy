@@ -1,4 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
+import { RiSoundModuleFill } from 'react-icons/ri';
 import { Text, Box, Flex } from 'rebass';
 import { Label, Select } from '@rebass/forms';
 
@@ -11,7 +12,6 @@ import FilterPair from './filter-pair';
 import Stack from './stack';
 import List from './list';
 import Card from './card';
-import { RiSoundModuleFill } from 'react-icons/ri';
 
 const LABELS = {
     instrument: 'Instrument',
