@@ -3,7 +3,7 @@
  */
 export default {
     brightness(value: string) {
-        const mid = 200;
+        const mid = 0.2;
         switch (value) {
             case 'Bright':
                 return { 'spectralCentroid.mean': { $gte: mid } };
@@ -43,7 +43,7 @@ export default {
     },
 
     noisiness(value: string) {
-        const mid = 0.5;
+        const mid = 0.1;
         switch (value) {
             case 'Noisy':
                 return { 'spectralFlatness.mean': { $gte: mid } };
@@ -59,11 +59,11 @@ export default {
     },
 
     pitchiness(value: string) {
-        const mid = 0.1;
+        const mid = 0.4;
         switch (value) {
-            case 'Rough':
+            case 'Tonal':
                 return { 'spectralKurtosis.mean': { $gte: mid } };
-            case 'Smooth':
+            case 'Atonal':
                 return { 'spectralKurtosis.mean': { $lte: mid } };
             default:
                 return {};
@@ -71,7 +71,7 @@ export default {
     },
 
     roughness(value: string) {
-        const mid = 1.0; // ?
+        const mid = 0.05;
         switch (value) {
             case 'Rough':
                 return { 'spectralFlux.mean': { $gte: mid } };
@@ -83,7 +83,7 @@ export default {
     },
 
     sharpness(value: string) {
-        const mid = 0.5;
+        const mid = 0.6;
         switch (value) {
             case 'Sharp':
                 return { 'perceptualSharpness.mean': { $gte: mid } };

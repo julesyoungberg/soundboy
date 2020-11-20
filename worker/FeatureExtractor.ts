@@ -30,7 +30,6 @@ const FEATURES = [
 ];
 
 const ESSENTIA_FEATURES = [
-    'loudness',
     'mfcc',
     'rms',
     'spectralCentroid',

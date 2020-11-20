@@ -33,7 +33,7 @@ export default function FilterPair({
     };
 
     return (
-        <Flex className={className} style={{ padding: 10 }}>
+        <Flex className={className} style={{ padding: '10px 0 10px 10px', width: '100%' }}>
             <Button
                 mr={2}
                 onClick={createChangeHandler(option1)}
@@ -44,6 +44,7 @@ export default function FilterPair({
                     marginRight: 0,
                     borderTopRightRadius: 0,
                     borderBottomRightRadius: 0,
+                    width: '50%',
                 }}
             >
                 {option1} {typeof option1Count !== 'undefined' && `(${option1Count})`}
@@ -57,6 +58,7 @@ export default function FilterPair({
                     cursor: 'pointer',
                     borderTopLeftRadius: 0,
                     borderBottomLeftRadius: 0,
+                    width: '50%',
                 }}
             >
                 {option2} {typeof option2Count !== 'undefined' && `(${option2Count})`}

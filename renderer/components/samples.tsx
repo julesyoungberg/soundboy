@@ -25,6 +25,12 @@ const SELECT = {
 
 const PAIRS = {
     brightness: ['Bright', 'Dark'],
+    fullness: ['Full', 'Holllow'],
+    // loudness: ['Loud', 'Quiet'],
+    // noisiness: ['Noisy', 'Soft'],
+    // pitchiness: ['Tonal', 'Atonal'],
+    roughness: ['Rough', 'Smooth'],
+    sharpness: ['Sharp', 'Dull'],
 };
 
 const GROUPS = {
