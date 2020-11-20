@@ -71,7 +71,7 @@ export default class IpcService {
 
     async analyze(folder: string, dispatch: (a: Action) => void) {
         const soundfiles = await getSoundFiles(folder);
-        dispatch({ type: 'analyzer_start', payload: { soundfiles } });
+        dispatch({ type: 'analyzer_start', payload: { folder, soundfiles } });
 
         this.getStream('analyze_sounds', { params: [folder] }, (data: IpcResponse) => {
             console.log('received update: ', data);
