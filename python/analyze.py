@@ -82,18 +82,18 @@ folder = "./Train"
 for root, dirs, files in os.walk(folder, topdown=False):
     for name in files:
         cur_dir = os.path.join(root, name)
-        label = root.split('\\')[-1]
+        label = cur_dir.split('/')[-2]
 
         # # Testing code
         # if (current_label != label):
         #     current_label = label
+        #     print(label)
         #     i = 0
         # if (i < 10):
         #     feature_vector, mfcc = get_features(cur_dir)
         #     i += 1
         #     if len(feature_vector) > 1:
         #         features.append(feature_vector)
-        #         print(i)
         #         # Standardizing mfcc data so coefficient dimension has zero mean and unit variance
         #         mfcc = sklearn.preprocessing.scale(mfcc.astype(float), axis=0)
         #         mfccs.append(mfcc)
@@ -104,7 +104,8 @@ for root, dirs, files in os.walk(folder, topdown=False):
         feature_vector, mfcc = get_features(cur_dir)
         if len(feature_vector) > 1:
             features.append(feature_vector)
-            # Standardizing mfcc data so coefficient dimension has zero mean and unit variance
+            
+            #Standardizing mfcc data so coefficient dimension has zero mean and unit variance
             mfcc = sklearn.preprocessing.scale(mfcc.astype(float), axis=0)
             mfccs.append(mfcc)
             labels.append(label)

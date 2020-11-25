@@ -4,76 +4,51 @@ import essentia, essentia.standard
 import numpy as np
 import os
 import json
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
 
-model = tf.keras.models.load_model('saved_models/soundboy_model.h5')
+model = tf.keras.models.load_model('saved_models/soundboy_model_new.h5')
 
 model.summary()
 
-def mfcc(d):
-    sr = 22050
-    duration = 5
-    audio, srate = librosa.load(d, sr = sr, mono = True, duration = duration, res_type='kaiser_best')
-    audio, index = librosa.effects.trim(y = audio, top_db=60, frame_length=2048, hop_length=512)
 
-    nfft = 2048
-    hop = 1024
+labels = np.load('labels.npy')
+labels = np.unique(labels)
 
-    # 0 pad to 2048 minimum size
-    if audio.size < 2048:
-        audio = np.pad(audio, (0, 2048 - audio.size), constant_values=(0, 0))
+print(labels)
+these_labels = []
+pred_labels = []
 
-    w = essentia.standard.Windowing(type = 'hann')
-    spectrum = essentia.standard.Spectrum()
-    mfcc = essentia.standard.MFCC(numberCoefficients=40, sampleRate=22050, numberBands = 128)
+mfccs = np.load('x_test_new.npy')
+these_labels = np.load('y_test_new.npy')
+real_labels = []
+print(mfccs[0].shape)
 
-    mfccs = []
+from tqdm import tqdm 
 
-
-    for frame in essentia.standard.FrameGenerator(audio, frameSize = nfft, hopSize = hop):
-        mfcc_bands, mfcc_coeffs = mfcc(spectrum(w(frame)))
-        mfccs.append(mfcc_coeffs)
-                
-    mfccs = essentia.array(mfccs).T
-
-    pad_width = 109 - mfccs.shape[1]
-    mfccs = np.pad(mfccs, pad_width=((0,0), (0, pad_width)), mode='reflect')
-
-    return mfccs
+for key, mfcc in enumerate(tqdm(mfccs)):
+    mfcc = mfcc.reshape(1, 12, 95, 1)
+    class_prediction = model.predict_classes(mfcc)
+    pred_labels.append(labels[class_prediction])
+    real_labels.append(these_labels[key])
 
 
+fig = plt.figure()
+ax = fig.add_subplot()
 
 
+cm = confusion_matrix(y_true = these_labels, y_pred = pred_labels)
+cax = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+fig.colorbar(cax)
+plt.tight_layout()
+ax.set_xticks(np.arange(10))
+ax.set_yticks(np.arange(10))
+ax.set_xticklabels(labels.tolist(), rotation=45)
+ax.set_yticklabels(labels.tolist())
+plt.ylabel('True label')
+plt.xlabel('Predicted label')
 
-i = 0
-current_label = ""
-labels = ["Bass", 'Cymbal', 'Guitar', 'Hat', 'Horn', 'Key', 'Kick', 'Snare', 'String', 'Wind']
+plt.show()
 
-folder = "./testing_samples"
-for root, dirs, files in os.walk(folder, topdown=False):
-    for name in files:
-        cur_dir = os.path.join(root, name)
-        label = root.split('/')[-1]
 
-        # Testing code
-        if (current_label != label):
-            current_label = label
-            i = 0
-        if (i < 10):
-            mfccs = mfcc(cur_dir)
-            # Reshape the input so it matches input model was trained on, 40 x 108 x 1 array
-            
-        # with open(cur_dir) as f:
-        #     mfccs = json.load(f)
-        #     mfccs = np.array(mfccs)
-            
-
-            #pad_width = 109 - mfccs.shape[1]
-            #mfccs = np.pad(mfccs, pad_width=((0,0), (0, pad_width)), mode='reflect')
-            mfccs = mfccs.reshape(1, 40, 109, 1)
-
-            class_prediction = model.predict_classes(mfccs)
-            probability_matrix = model.predict_proba(mfccs)
-
-            print(label, labels[class_prediction[0]])
-            #print(probability_matrix)
-            i += 1
