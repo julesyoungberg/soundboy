@@ -13,8 +13,6 @@ import Stack from './stack';
 import List from './list';
 import Card from './card';
 
-const SHOW_SEARCH = true;
-
 const LABELS = {
     instrument: 'Instrument',
     pitch: 'Pitch',
@@ -163,19 +161,17 @@ const Samples = () => {
                     </Text>
                 </Flex>
                 <Card>
-                    {SHOW_SEARCH && (
-                        <Flex>
-                            <Box style={{ padding: 10, width: '100%' }}>
-                                <Input
-                                    id='search'
-                                    name='search'
-                                    placeholder='Search Samples'
-                                    onChange={onUpdateFilterFactory('name')}
-                                    style={{ width: '100%' }}
-                                />
-                            </Box>
-                        </Flex>
-                    )}
+                    <Flex>
+                        <Box style={{ padding: 10, width: '100%' }}>
+                            <Input
+                                id='search'
+                                name='search'
+                                placeholder='Search Samples'
+                                onChange={onUpdateFilterFactory('name')}
+                                style={{ width: '100%' }}
+                            />
+                        </Box>
+                    </Flex>
                     <Flex>
                         {Object.entries(SELECT).map(([key, options]) => (
                             <Box key={key} width={1 / 2} style={{ padding: 10 }}>
