@@ -8,6 +8,7 @@ import { ArrayFeature, Feature, Sound } from '../@types';
 
 import Classifier from './Classifier';
 import { N_MFCC_BANDS, N_MFCC_COEFS } from './config';
+import getEssentia from './getEssentia';
 
 const FEATURES = [
     // Meyda Feaures
@@ -49,6 +50,7 @@ interface FeatureExtractorOptions {
     frameSize?: number;
     hopSize?: number;
     sampleRate?: number;
+    useEssentia?: boolean;
 }
 
 interface FeatureTracks {
@@ -99,6 +101,7 @@ export default class FeatureExtractor {
     essentia: Essentia | undefined;
     meydaFeatures: Record<string, boolean> = {};
     essentiaFeatures: Record<string, boolean> = {};
+    useEssentia: boolean = true;
 
     constructor(config: FeatureExtractorOptions = {}) {
         if (config.features) this.features = config.features;
@@ -106,29 +109,31 @@ export default class FeatureExtractor {
         if (config.hopSize) this.hopSize = config.hopSize;
         if (config.sampleRate) this.sampleRate = config.sampleRate;
 
-        if (this.features.includes('instrument')) {
-            // this.features should only contain meyda features
+        this.useEssentia = config.useEssentia ?? true;
+
+        if (this.useEssentia && this.features.includes('instrument')) {
             this.features = this.features.filter((feature) => feature !== 'instrument');
             this.classifier = new Classifier();
         }
 
         this.features.forEach((feature) => {
-            if (ESSENTIA_FEATURES.includes(feature)) {
+            if (this.useEssentia && ESSENTIA_FEATURES.includes(feature)) {
                 this.essentiaFeatures[feature] = true;
-            } else {
+            } else if (feature !== 'spectralFlux') {
                 this.meydaFeatures[feature] = true;
             }
         });
     }
 
     ready() {
-        return !!this.essentia && (!this.classifier || this.classifier.ready());
+        return !this.useEssentia || (!!this.essentia && (!this.classifier || this.classifier.ready()));
     }
 
     async setup() {
         console.log('FEATURE EXTRACTOR SETUP');
-        const essentiaWASM = await (window as any).EssentiaWASM();
-        this.essentia = new (window as any).Essentia(essentiaWASM);
+        if (this.useEssentia) {
+            this.essentia = await getEssentia();
+        }
         await this.classifier?.setup();
     }
 
@@ -182,14 +187,49 @@ export default class FeatureExtractor {
         let prevFrame = new Float32Array(this.frameSize).fill(0);
         const meydaFeaturs = Object.keys(this.meydaFeatures);
 
-        // use essentia to generate frames
         console.log('getting frames');
-        const frames = this.essentia.FrameGenerator(buffer, this.frameSize, this.hopSize);
+        let n = 0;
+        let getFrame: ((i: number) => any) | undefined;
+        if (this.useEssentia) {
+            // use essentia to generate frames
+            const frames = this.essentia.FrameGenerator(buffer, this.frameSize, this.hopSize);
+            n = frames.size();
+            getFrame = (i: number) => this.window(frames.get(i));
+        } else {
+            // generate our own frames for meyda
+            n = Math.ceil((buffer.length - (this.frameSize - this.hopSize)) / this.hopSize);
+            getFrame = (i: number) => {
+                const start = i * this.hopSize;
+                const end = Math.min(buffer.length, (i + 1) * this.hopSize);
+                return buffer.slice(start, end);
+            };
+        }
 
         // step through signal
-        console.log('stepping through signal');
-        for (let i = 0; i < frames.size(); i++) {
-            const frame = this.window(frames.get(i));
+        for (let i = 0; i < n; i++) {
+            const frame: any = getFrame(i);
+            console.log('processing frame', frame);
+
+            // meyda features
+            if (meydaFeaturs.length > 0) {
+                let samples: Float32Array | undefined;
+                if (this.useEssentia) {
+                    samples = this.essentia.vectorToArray(frame);
+                } else {
+                    samples = frame;
+                }
+
+                const features = meyda.extract(meydaFeaturs, samples, prevFrame);
+                prevFrame = samples;
+                Object.keys(features).forEach((feature) => {
+                    results[feature]?.push(features[feature]);
+                });
+            }
+
+            if (!this.useEssentia) {
+                continue;
+            }
+
             const { spectrum } = this.essentia.Spectrum(frame, this.frameSize);
 
             // compute essentia features
@@ -248,19 +288,7 @@ export default class FeatureExtractor {
                     results.spectralKurtosis.push(kurtosis);
                 }
             }
-
-            // meyda features
-            if (meydaFeaturs.length > 0) {
-                const samples = this.essentia.vectorToArray(frames.get(i));
-                const features = meyda.extract(meydaFeaturs, samples, prevFrame);
-                prevFrame = samples;
-                Object.keys(features).forEach((feature) => {
-                    results[feature]?.push(features[feature]);
-                });
-            }
         }
-
-        console.log('computed feature tracks');
 
         return results;
     }
@@ -351,7 +379,7 @@ export default class FeatureExtractor {
             throw new Error(`Error detecting pitch from '${filename}': ${e}`);
         }
 
-        if (featureTracks.mfcc && this.classifier) {
+        if (this.useEssentia && featureTracks.mfcc && this.classifier) {
             console.log('classifying');
             // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
             result.instrument = await this.getInstrument(featureTracks.mfcc);

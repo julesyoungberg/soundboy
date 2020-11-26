@@ -10,6 +10,7 @@ const extractor = new FeatureExtractor({
     features: ['rms'],
     frameSize: FRAME_SIZE,
     hopSize: HOP_SIZE,
+    useEssentia: false,
 });
 
 /**
@@ -32,7 +33,6 @@ export function trimStart(input: Float32Array) {
 export default async function trimSamples(input: Float32Array) {
     let data: { rms: number[] }
     try {
-        console.log('GETTING RMS');
         data = await extractor.getFeatureTracks(input);
     } catch (e) {
         throw new Error(`Error getting sample RMS: ${e}`);
