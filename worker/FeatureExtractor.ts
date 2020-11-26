@@ -1,5 +1,4 @@
 import * as tf from '@tensorflow/tfjs';
-// import fs from 'fs';
 // eslint-disable-next-line
 import Essentia from 'essentia.js/dist/core_api';
 import meyda from 'meyda/dist/node/main';
@@ -335,12 +334,12 @@ export default class FeatureExtractor {
      * High level classification algorithm
      * @param mfccs
      */
-    async getInstrument(mfccs: number[][]): Promise<string | undefined> {
+    async getInstrument(mfccs: number[][], filename?: string): Promise<string | undefined> {
         if (!(this.classifier && mfccs && mfccs.length > 0)) {
             return undefined;
         }
 
-        const instrument = await this.classifier.classify(mfccs);
+        const instrument = await this.classifier.classify(mfccs, filename);
         return instrument;
     }
 
@@ -349,9 +348,6 @@ export default class FeatureExtractor {
      * @param buffer
      */
     async getFeatures(buffer: Float32Array, filename: string): Promise<Sound> {
-        // const pathParts = filename.split('/');
-        // const f = pathParts[pathParts.length - 1].split(' ').join('_');
-        // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
         console.log('computing features');
         let featureTracks: FeatureTracks = initialFeatureTracks();
         try {
@@ -382,7 +378,7 @@ export default class FeatureExtractor {
         if (this.useEssentia && featureTracks.mfcc && this.classifier) {
             console.log('classifying');
             // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfcc.json`, JSON.stringify(mfccs, null, 2));
-            result.instrument = await this.getInstrument(featureTracks.mfcc);
+            result.instrument = await this.getInstrument(featureTracks.mfcc, filename);
         }
 
         return result;

@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
+import fs from 'fs';
 
 import { INSTRUMENTS } from '../constants';
 
@@ -29,7 +30,7 @@ export default class Classifier {
      * Preprocess mfcc input data for
      * @param raw
      */
-    preprocess(raw: number[][]) {
+    preprocess(raw: number[][], filename?: string) {
         // make sure the mfcc vector is the right length
         const { n } = this;
         let mfccs = raw.map((coefs) => coefs.slice(1));
@@ -49,6 +50,11 @@ export default class Classifier {
         // transpose and reshape the data
         try {
             const data = tf.tensor(mfccs).transpose();
+
+            // const pathParts = filename.split('/');
+            // const f = pathParts[pathParts.length - 1].split(' ').join('_');
+            // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfccs.json`, JSON.stringify(data, null, 2));
+
             return data.reshape([1, N_MFCC_COEFS - 1, n, 1]);
         } catch (e) {
             throw new Error(`Error reshaping mfcc vector: ${e}`);
@@ -59,8 +65,8 @@ export default class Classifier {
      * Main classification routine
      * @param raw
      */
-    async classify(raw: number[][]): Promise<string> {
-        const data = this.preprocess(raw);
+    async classify(raw: number[][], filename?: string): Promise<string> {
+        const data = this.preprocess(raw, filename);
 
         try {
             let prediction = this.model.predict(data);

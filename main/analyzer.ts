@@ -168,7 +168,7 @@ export default class Analyzer {
             const task = this.tasks[i];
             if (task.status === 'queued') {
                 this.tasks[i].status = 'inprogress';
-                // this.tasks[i].attempts += 1;
+                this.tasks[i].attempts += 1;
                 return { sound: { filename: task.filename }, workerID };
             }
         }

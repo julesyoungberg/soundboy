@@ -9,5 +9,5 @@ export default abstract class Channel {
         return `${this.name}_response`;
     }
 
-    abstract async handler(event: IpcMainEvent, request: IpcRequest): Promise<void>;
+    abstract handler(event: IpcMainEvent, request: IpcRequest): Promise<void>;
 }

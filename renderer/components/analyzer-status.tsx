@@ -27,7 +27,7 @@ const StyledHeading = styled(Heading)`
 
 const Errors = styled(Box)`
     padding-bottom: 10px;
-    height: 200px;
+    max-height: 200px;
     overflow: scroll;
 `;
 
