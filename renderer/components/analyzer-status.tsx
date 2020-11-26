@@ -54,14 +54,14 @@ export default function AnalyzerStatus() {
 
     let headerContent: ReactNode | undefined;
     if (analyzer.running) {
-        let latest = analyzer.latest || '';
+        let latest = analyzer.latest || `${analyzer.tasks.length} sound files, this might take a while...`;
         if (latest && analyzer.folder) {
             latest = latest.replace(analyzer.folder, '');
         }
 
         headerContent = (
             <ProgressContainer>
-                <small>Analyzing... {latest}</small>
+                <small>Analyzing {latest}</small>
                 <Line percent={percent} strokeColor={theme.colors.secondary} />
             </ProgressContainer>
         );
