@@ -47,7 +47,7 @@ export default {
             return {};
         }
 
-        return { 'filename': { $regex: new RegExp(value, 'i') } };
+        return { filename: { $regex: new RegExp(value, 'i') } };
     },
 
     noisiness(value: string) {

@@ -31,7 +31,7 @@ export function trimStart(input: Float32Array) {
  * @param input
  */
 export default async function trimSamples(input: Float32Array) {
-    let data: { rms: number[] }
+    let data: { rms: number[] };
     try {
         data = await extractor.getFeatureTracks(input);
     } catch (e) {

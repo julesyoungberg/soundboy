@@ -101,7 +101,7 @@ export default class FeatureExtractor {
     essentia: Essentia | undefined;
     meydaFeatures: Record<string, boolean> = {};
     essentiaFeatures: Record<string, boolean> = {};
-    useEssentia: boolean = true;
+    useEssentia = true;
 
     constructor(config: FeatureExtractorOptions = {}) {
         if (config.features) this.features = config.features;

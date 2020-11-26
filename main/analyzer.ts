@@ -57,9 +57,9 @@ export default class Analyzer {
 
         console.log('fetching sound files');
         const filenames = await getSoundFiles(folder);
-        this.tasks = filenames.map(filename => ({ 
-            attempts: 0, 
-            filename, 
+        this.tasks = filenames.map((filename) => ({
+            attempts: 0,
+            filename,
             status: 'queued',
         }));
         const numTasks = this.tasks.length;
@@ -98,6 +98,9 @@ export default class Analyzer {
                     error = (error as any).message;
                 }
 
+                // this worker was already working on something.
+                // this fix is a bit of a band aid for the actual problem
+                // of workers receiving duplicate messages.
                 if (error === 'busy') {
                     return;
                 }
