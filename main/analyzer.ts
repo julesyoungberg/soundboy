@@ -11,15 +11,21 @@ const NUM_WORKERS = Math.ceil(os.cpus().length);
 
 function createWorkerWindow() {
     const window = new BrowserWindow({
-        // show: false,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
         },
     });
 
     window.loadURL(`file://${path.resolve(__dirname, '../worker/dist/index.html')}`);
-    window.webContents.openDevTools();
+    // window.webContents.openDevTools();
     return window;
+}
+
+interface Task {
+    attempts: number;
+    filename: string;
+    status: 'queued' | 'inprogress' | 'completed';
 }
 
 /**
@@ -30,7 +36,7 @@ function createWorkerWindow() {
  */
 export default class Analyzer {
     workers: BrowserWindow[];
-    tasks: string[];
+    tasks: Task[];
     callback?: (reply: IpcResponse) => void;
 
     constructor() {
@@ -50,7 +56,12 @@ export default class Analyzer {
         }
 
         console.log('fetching sound files');
-        this.tasks = await getSoundFiles(folder);
+        const filenames = await getSoundFiles(folder);
+        this.tasks = filenames.map(filename => ({ 
+            attempts: 0, 
+            filename, 
+            status: 'queued',
+        }));
         const numTasks = this.tasks.length;
         this.callback = callback;
 
@@ -97,8 +108,24 @@ export default class Analyzer {
                     return;
                 }
 
+                // requeue task
+                let returnError = true;
+                if (result.sound?.filename) {
+                    for (let i = 0; i < this.tasks.length; i++) {
+                        const task = this.tasks[i];
+                        if (task.filename === result.sound.filename && task.attempts < 3) {
+                            this.tasks[i].status = 'queued';
+                            returnError = false;
+                            break;
+                        }
+                    }
+                }
+
                 console.error(result.error);
-                this.callback({ error: result.error, result: result.sound });
+
+                if (returnError) {
+                    this.callback({ error: result.error, result: result.sound });
+                }
             } else {
                 // save correct data in the database and update the UI
                 console.log('saving sound');
@@ -110,10 +137,12 @@ export default class Analyzer {
             this.callback({ error });
         }
 
+        const task = this.getTaskFor(result.workerID);
+
         // assign next task
-        if (this.tasks.length > 0) {
+        if (task) {
             console.log(`assigning task to ${result.workerID} over channel ${TASKS_CHANNEL}`);
-            event.sender.send(TASKS_CHANNEL, this.taskAssignment(result.workerID));
+            event.sender.send(TASKS_CHANNEL, task);
         } else {
             // kill worker since there's no more work
             console.log('killing worker');
@@ -124,23 +153,29 @@ export default class Analyzer {
             if (this.workers.every((worker) => worker === undefined)) {
                 // this is the last worker, we're done here
                 this.workers = [];
+                this.tasks = [];
                 console.log('analyzer finished');
                 this.callback({ done: true });
             }
         }
     }
 
-    private taskAssignment(workerID: number) {
-        const filename = this.tasks.shift();
-        return {
-            sound: { filename },
-            workerID,
-        };
+    private getTaskFor(workerID: number) {
+        for (let i = 0; i < this.tasks.length; i++) {
+            const task = this.tasks[i];
+            if (task.status === 'queued') {
+                this.tasks[i].status = 'inprogress';
+                // this.tasks[i].attempts += 1;
+                return { sound: { filename: task.filename }, workerID };
+            }
+        }
+
+        return undefined;
     }
 
     private assignTaskTo(id: number) {
         console.log(`Assigning task to ${id} over channel ${TASKS_CHANNEL}`);
         const worker = this.workers[id];
-        worker.webContents.send(TASKS_CHANNEL, this.taskAssignment(id));
+        worker.webContents.send(TASKS_CHANNEL, this.getTaskFor(id));
     }
 }
