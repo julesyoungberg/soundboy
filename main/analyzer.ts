@@ -11,14 +11,14 @@ const NUM_WORKERS = Math.ceil(os.cpus().length);
 
 function createWorkerWindow() {
     const window = new BrowserWindow({
-        show: false,
+        // show: false,
         webPreferences: {
             nodeIntegration: true,
         },
     });
 
     window.loadURL(`file://${path.resolve(__dirname, '../worker/dist/index.html')}`);
-    // window.webContents.openDevTools();
+    window.webContents.openDevTools();
     return window;
 }
 
@@ -86,8 +86,14 @@ export default class Analyzer {
                 if (typeof error === 'object') {
                     error = (error as any).message;
                 }
+
+                if (error === 'busy') {
+                    return;
+                }
+
                 // weird bug coming from tensorflow when essentia is also loaded
-                if (error.includes('Variable with name conv2d/kernel was already registered')) {
+                if (error.includes('conv2d/kernel') || error.includes('conv2d/bias')) {
+                    console.log(error);
                     return;
                 }
 

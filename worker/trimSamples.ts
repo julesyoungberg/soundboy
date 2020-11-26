@@ -30,7 +30,15 @@ export function trimStart(input: Float32Array) {
  * @param input
  */
 export default async function trimSamples(input: Float32Array) {
-    const { rms } = await extractor.getFeatureTracks(input);
+    let data: { rms: number[] }
+    try {
+        console.log('GETTING RMS');
+        data = await extractor.getFeatureTracks(input);
+    } catch (e) {
+        throw new Error(`Error getting sample RMS: ${e}`);
+    }
+
+    const { rms } = data;
 
     const mse = rms.map((v) => v * v);
     const t = tf.tensor(mse);

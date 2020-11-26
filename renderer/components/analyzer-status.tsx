@@ -36,6 +36,7 @@ const ErrorMessage = styled.div<{ color?: string }>`
     width: 100%;
     font-size: 13px;
     color: ${(props) => props.color};
+    word-break: break-all;
 `;
 
 export default function AnalyzerStatus() {

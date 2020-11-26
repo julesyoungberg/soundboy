@@ -2,7 +2,7 @@ import * as tf from '@tensorflow/tfjs';
 
 import { INSTRUMENTS } from '../constants';
 
-export const N_MFCCS = 40;
+import { N_MFCC_COEFS } from './config';
 
 /**
  * Classifier class
@@ -11,7 +11,7 @@ export const N_MFCCS = 40;
  * - performing the classification
  */
 export default class Classifier {
-    n = 108;
+    n = 95;
     model: tf.LayersModel | undefined;
 
     ready() {
@@ -19,6 +19,7 @@ export default class Classifier {
     }
 
     async setup() {
+        console.log('SETTING UP CLASSIFIER');
         this.model = await tf.loadLayersModel(
             'https://storage.googleapis.com/soundboy-models/instrument_prediction_model/model.json'
         );
@@ -31,28 +32,24 @@ export default class Classifier {
     preprocess(raw: number[][]) {
         // make sure the mfcc vector is the right length
         const { n } = this;
-        const mfccs = raw;
+        let mfccs = raw.map((coefs) => coefs.slice(1));
         try {
-            if (mfccs[0].length < n) {
-                const d = n - mfccs[0].length;
-                for (let m = 0; m < N_MFCCS; m++) {
-                    for (let i = 0; i < d; i++) {
-                        mfccs[m].push(0);
-                    }
+            if (mfccs.length < n) {
+                const d = n - mfccs.length;
+                for (let i = 0; i < d; i++) {
+                    mfccs.push(new Array(N_MFCC_COEFS - 1).fill(0));
                 }
-            } else if (mfccs[0].length > n) {
-                for (let m = 0; m < N_MFCCS; m++) {
-                    mfccs[m] = mfccs[m].slice(0, n);
-                }
+            } else if (mfccs.length > n) {
+                mfccs = mfccs.slice(0, n);
             }
         } catch (e) {
             throw new Error(`Error standardizing mfcc vector length: ${e}`);
         }
 
+        // transpose and reshape the data
         try {
-            const data = tf.tensor(mfccs);
-            const reshaped = data.reshape([1, N_MFCCS, n, 1]);
-            return reshaped;
+            const data = tf.tensor(mfccs).transpose();
+            return data.reshape([1, N_MFCC_COEFS - 1, n, 1]);
         } catch (e) {
             throw new Error(`Error reshaping mfcc vector: ${e}`);
         }
