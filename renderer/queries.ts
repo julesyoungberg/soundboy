@@ -42,6 +42,14 @@ export default {
         }
     },
 
+    name(value: string) {
+        if (!value) {
+            return {};
+        }
+
+        return { filename: { $regex: new RegExp(value, 'i') } };
+    },
+
     noisiness(value: string) {
         const mid = 0.1;
         switch (value) {

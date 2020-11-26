@@ -8,6 +8,8 @@ import analyze from './analyze';
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
+const state = { busy: false };
+
 /**
  * Main worker logic
  * given a filename, load it, analyze it, return the results
@@ -25,12 +27,18 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMess
         event.sender.send(RESULTS_CHANNEL, response);
     };
 
+    if (state.busy) {
+        reply({ error: 'busy' });
+        return;
+    }
+
     if (!data.sound.filename) {
         reply({ error: 'Missing filename' });
         return;
     }
 
     try {
+        state.busy = true;
         console.log('analyzing');
         const sound = await analyze(data.sound.filename);
         console.log('analyzed: ', sound);
@@ -39,6 +47,8 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMess
         console.error(error);
         reply({ error, sound: data.sound });
     }
+
+    state.busy = false;
 });
 
 console.log(`Listening for tasks on channel: ${TASKS_CHANNEL}`);
