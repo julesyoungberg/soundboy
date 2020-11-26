@@ -1,7 +1,7 @@
 import React, { useEffect, useReducer, useState } from 'react';
 import { RiSoundModuleFill } from 'react-icons/ri';
 import { Text, Box, Flex } from 'rebass';
-import { Label, Select } from '@rebass/forms';
+import { Input, Label, Select } from '@rebass/forms';
 
 import { INSTRUMENTS } from '../../constants';
 import useAppState from '../hooks/useAppState';
@@ -12,6 +12,8 @@ import FilterPair from './filter-pair';
 import Stack from './stack';
 import List from './list';
 import Card from './card';
+
+const SHOW_SEARCH = true;
 
 const LABELS = {
     instrument: 'Instrument',
@@ -60,6 +62,7 @@ const initialFilter = {
     instrument: 'All',
     pitch: 'All',
     brightness: 'All',
+    name: '',
     noisiness: 'All',
 };
 
@@ -160,6 +163,19 @@ const Samples = () => {
                     </Text>
                 </Flex>
                 <Card>
+                    {SHOW_SEARCH && (
+                        <Flex>
+                            <Box style={{ padding: 10, width: '100%' }}>
+                                <Input
+                                    id='search'
+                                    name='search'
+                                    placeholder='Search Samples'
+                                    onChange={onUpdateFilterFactory('name')}
+                                    style={{ width: '100%' }}
+                                />
+                            </Box>
+                        </Flex>
+                    )}
                     <Flex>
                         {Object.entries(SELECT).map(([key, options]) => (
                             <Box key={key} width={1 / 2} style={{ padding: 10 }}>
