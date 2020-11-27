@@ -8,6 +8,7 @@ export default async function getEssentia(): Promise<Essentia> {
         return essentia;
     }
 
+    console.log('LOADING ESSENTIA');
     const essentiaWASM = await (window as any).EssentiaWASM();
     essentia = new (window as any).Essentia(essentiaWASM);
     return essentia;

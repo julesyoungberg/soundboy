@@ -20,7 +20,6 @@ export default class Classifier {
     }
 
     async setup() {
-        console.log('SETTING UP CLASSIFIER');
         this.model = await tf.loadLayersModel(
             'https://storage.googleapis.com/soundboy-models/instrument_prediction_model/model.json'
         );
@@ -51,9 +50,11 @@ export default class Classifier {
         try {
             const data = tf.tensor(mfccs).transpose();
 
+            // const buffer = Array.from(data.dataSync());
+            // const json = new Array(N_MFCC_COEFS - 1).fill([]).map((_, i) => buffer.slice(i * n, (i + 1) * n));
             // const pathParts = filename.split('/');
             // const f = pathParts[pathParts.length - 1].split(' ').join('_');
-            // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfccs.json`, JSON.stringify(data, null, 2));
+            // fs.writeFileSync(`/Users/jules/workspace/soundboy/${f}-mfccs.json`, JSON.stringify(json, null, 2));
 
             return data.reshape([1, N_MFCC_COEFS - 1, n, 1]);
         } catch (e) {

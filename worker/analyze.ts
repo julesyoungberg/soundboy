@@ -9,6 +9,7 @@ const extractor = new FeatureExtractor({
     frameSize: FRAME_SIZE,
     hopSize: HOP_SIZE,
     sampleRate: SAMPLE_RATE,
+    useEssentia: true,
 });
 
 /**

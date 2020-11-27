@@ -1,3 +1,4 @@
+import debounce from 'lodash.debounce';
 import { IpcRendererEvent } from 'electron';
 
 import { AnalyzerMessage } from '../@types';
@@ -8,15 +9,12 @@ import analyze from './analyze';
 const electron = window.require('electron');
 const { ipcRenderer } = electron;
 
-const state = { busy: false };
-
 /**
  * Main worker logic
  * given a filename, load it, analyze it, return the results
- */
-
-ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMessage) => {
-    console.log('Received task - worker ID: ', data.workerID);
+*/
+async function handler(event: IpcRendererEvent, data: AnalyzerMessage) {
+    console.log(`Received task - worker ID: ${data.workerID}`);
 
     const reply = (res: Partial<AnalyzerMessage>) => {
         const response = {
@@ -25,12 +23,8 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMess
         };
         console.log('responding with:', response);
         event.sender.send(RESULTS_CHANNEL, response);
+        register();
     };
-
-    if (state.busy) {
-        reply({ error: 'busy' });
-        return;
-    }
 
     if (!data.sound.filename) {
         reply({ error: 'Missing filename' });
@@ -38,8 +32,6 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMess
     }
 
     try {
-        state.busy = true;
-        console.log('analyzing');
         const sound = await analyze(data.sound.filename);
         console.log('analyzed: ', sound);
         reply({ sound });
@@ -47,8 +39,12 @@ ipcRenderer.on(TASKS_CHANNEL, async (event: IpcRendererEvent, data: AnalyzerMess
         console.error(error);
         reply({ error, sound: data.sound });
     }
+}
 
-    state.busy = false;
-});
+function register() {
+    console.log(`Listening for tasks on channel: ${TASKS_CHANNEL}`);
+    // use once and throttle to prevent duplicate messages
+    ipcRenderer.once(TASKS_CHANNEL, handler);
+}
 
-console.log(`Listening for tasks on channel: ${TASKS_CHANNEL}`);
+register();
