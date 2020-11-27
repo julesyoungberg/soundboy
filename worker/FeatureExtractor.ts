@@ -292,9 +292,10 @@ export default class FeatureExtractor {
             }
         }
 
-        const pathParts = filename.split('/');
-        const f = pathParts[pathParts.length - 1].split(' ').join('_');
-        fs.writeFileSync(`/Users/jules/workspace/soundboy/python/notebooks/frames/${f}-frames.json`, JSON.stringify(frames, null, 2));
+        // Save the frames to a file for comparisons in python
+        // const pathParts = filename.split('/');
+        // const f = pathParts[pathParts.length - 1].split(' ').join('_');
+        // fs.writeFileSync(`/Users/jules/workspace/soundboy/python/notebooks/frames/${f}-frames.json`, JSON.stringify(frames, null, 2));
 
         return results;
     }
@@ -355,6 +356,11 @@ export default class FeatureExtractor {
      * @param buffer
      */
     async getFeatures(buffer: Float32Array, filename: string): Promise<Sound> {
+        // Save buffer to file for comparisons with python results
+        // const pathParts = filename.split('/');
+        // const f = pathParts[pathParts.length - 1].split(' ').join('_');
+        // fs.writeFileSync(`/Users/jules/workspace/soundboy/python/notebooks/buffers/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
+
         console.log('computing features');
         let featureTracks: FeatureTracks = initialFeatureTracks();
         try {

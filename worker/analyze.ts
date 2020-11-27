@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 import { Sound } from '../@types';
 
 import { MAX_CLIP_LENGTH, SAMPLE_RATE } from './config';
@@ -51,10 +49,6 @@ export default async function analyze(filename: string, testing?: boolean): Prom
     console.log('Analyze Worker - filename: ', filename);
 
     let buffer = await loadSoundFile(filename, testing ? undefined : SAMPLE_RATE);
-
-    const pathParts = filename.split('/');
-    const f = pathParts[pathParts.length - 1].split(' ').join('_');
-    fs.writeFileSync(`/Users/jules/workspace/soundboy/python/notebooks/buffers/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
 
     // try {
     //     buffer = await trimSamples(buffer);
