@@ -4,3 +4,5 @@ node_modules
 app
 dist
 .data
+*-mfccs.json
+python/Train
