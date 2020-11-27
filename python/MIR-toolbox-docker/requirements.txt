@@ -1,0 +1,22 @@
+numpy
+jupyter
+pyzmq
+scipy
+pandas
+matplotlib
+statsmodels
+scikit-learn
+seaborn
+nltk
+gensim
+sympy
+bokeh
+music21
+mido
+networkx
+requests
+beautifulsoup4
+tensorflow
+-e git+https://github.com/MTG/freesound-python.git#egg=freesound-python
+-e git+https://github.com/craffel/mir_eval.git#egg=mir_eval
+-e git+https://github.com/MTG/pycompmusic.git#egg=compmusic
