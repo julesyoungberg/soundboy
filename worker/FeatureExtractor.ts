@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
+import fs from 'fs';
 // eslint-disable-next-line
 import Essentia from 'essentia.js/dist/core_api';
 import meyda from 'meyda/dist/node/main';
@@ -6,7 +7,7 @@ import meyda from 'meyda/dist/node/main';
 import { ArrayFeature, Feature, Sound } from '../@types';
 
 import Classifier from './Classifier';
-import { N_MFCC_BANDS, N_MFCC_COEFS } from './config';
+import { FRAME_SIZE, HOP_SIZE, N_MFCC_BANDS, N_MFCC_COEFS, SAMPLE_RATE } from './config';
 import getEssentia from './getEssentia';
 
 const FEATURES = [
@@ -93,9 +94,9 @@ const initialFeatureTracks = (): FeatureTracks => ({
  */
 export default class FeatureExtractor {
     features: string[] = FEATURES;
-    frameSize = 2048;
-    hopSize = 1024;
-    sampleRate = 22050;
+    frameSize = FRAME_SIZE;
+    hopSize = HOP_SIZE;
+    sampleRate = SAMPLE_RATE;
     classifier: Classifier | undefined;
     essentia: Essentia | undefined;
     meydaFeatures: Record<string, boolean> = {};
@@ -172,7 +173,7 @@ export default class FeatureExtractor {
      * hops through buffer analyzing each window
      * @param buffer
      */
-    async getFeatureTracks(buffer: Float32Array): Promise<FeatureTracks> {
+    async getFeatureTracks(buffer: Float32Array, filename?: string): Promise<FeatureTracks> {
         console.log(`Getting Feature Tracks (using Essentia: ${this.useEssentia}`);
         
         if (!this.ready()) {
@@ -187,7 +188,7 @@ export default class FeatureExtractor {
         let prevFrame = new Float32Array(this.frameSize).fill(0);
         const meydaFeaturs = Object.keys(this.meydaFeatures);
 
-        let n = 0;
+        let n = 0; // Math.floor((buffer.length - this.frameSize) / this.hopSize) + 1;
         let getFrame: ((i: number) => any) | undefined;
         if (this.useEssentia) {
             // use essentia to generate frames
@@ -204,6 +205,8 @@ export default class FeatureExtractor {
             };
         }
 
+        const frames: number[][] = [];
+
         // step through signal
         for (let i = 0; i < n; i++) {
             const frame: any = getFrame(i);
@@ -217,6 +220,7 @@ export default class FeatureExtractor {
                     samples = frame;
                 }
 
+                frames.push(Array.from(samples));
                 const features = meyda.extract(meydaFeaturs, samples, prevFrame);
                 prevFrame = samples;
                 Object.keys(features).forEach((feature) => {
@@ -288,6 +292,10 @@ export default class FeatureExtractor {
             }
         }
 
+        const pathParts = filename.split('/');
+        const f = pathParts[pathParts.length - 1].split(' ').join('_');
+        fs.writeFileSync(`/Users/jules/workspace/soundboy/python/notebooks/frames/${f}-frames.json`, JSON.stringify(frames, null, 2));
+
         return results;
     }
 
@@ -350,7 +358,7 @@ export default class FeatureExtractor {
         console.log('computing features');
         let featureTracks: FeatureTracks = initialFeatureTracks();
         try {
-            featureTracks = await this.getFeatureTracks(buffer);
+            featureTracks = await this.getFeatureTracks(buffer, filename);
         } catch (e) {
             throw new Error(`Error extracting features from '${filename}': ${e}`);
         }

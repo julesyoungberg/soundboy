@@ -6,5 +6,5 @@ import glob from 'glob-promise';
  * @returns an array of sound file names
  */
 export default function getSoundFiles(folder: string): Promise<string[]> {
-    return glob.promise(`${folder}/**/*.{mp3,wav}`);
+    return glob.promise(`${folder}/**/*.{mp3,wav}`, { nocase: true });
 }

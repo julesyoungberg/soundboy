@@ -25,7 +25,7 @@ popd
 npm run notebooks
 ```
 
-Visit `http://localhost:8888` and sign in with password `mir`.
+Visit `http://localhost:8889` and sign in with password `mir`.
 
 ### Preparing a Keras Model for Deployment in JS
 

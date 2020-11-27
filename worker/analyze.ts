@@ -1,42 +1,39 @@
+import fs from 'fs';
+
 import { Sound } from '../@types';
 
-import { FRAME_SIZE, HOP_SIZE, MAX_CLIP_LENGTH, SAMPLE_RATE } from './config';
+import { MAX_CLIP_LENGTH, SAMPLE_RATE } from './config';
 import FeatureExtractor from './FeatureExtractor';
 import loadSoundFile from './loadSoundFile';
 import trimSamples from './trimSamples';
 
-const extractor = new FeatureExtractor({
-    frameSize: FRAME_SIZE,
-    hopSize: HOP_SIZE,
-    sampleRate: SAMPLE_RATE,
-    useEssentia: true,
-});
+const extractor = new FeatureExtractor({ useEssentia: true });
 
 /**
  * Appends the desired number of zeros onto the input buffer
  * @param input
  * @param numZeros
  */
-function zeroPad(input: Float32Array, numZeros: number) {
-    const output = new Float32Array(input.length + numZeros).fill(0);
-    for (let i = 0; i < input.length; i++) {
-        output[i] = input[i];
-    }
+// function zeroPad(input: Float32Array, numZeros: number) {
+//     const output = new Float32Array(input.length + numZeros).fill(0);
+//     for (let i = 0; i < input.length; i++) {
+//         output[i] = input[i];
+//     }
 
-    return output;
-}
+//     return output;
+// }
 
 /**
  * Standardize the length of the input buffer to fit within the frame size and max length
  * @param input
  */
 function standardize(input: Float32Array) {
-    const min = FRAME_SIZE;
+    // const min = FRAME_SIZE;
     const max = MAX_CLIP_LENGTH * SAMPLE_RATE;
 
-    if (input.length < min) {
-        return zeroPad(input, min - input.length);
-    }
+    // if (input.length < min) {
+    //     return zeroPad(input, min - input.length);
+    // }
 
     if (input.length > max) {
         return input.subarray(0, max);
@@ -55,11 +52,15 @@ export default async function analyze(filename: string, testing?: boolean): Prom
 
     let buffer = await loadSoundFile(filename, testing ? undefined : SAMPLE_RATE);
 
-    try {
-        buffer = await trimSamples(buffer);
-    } catch (e) {
-        throw new Error(`Error trimming samples: ${e}`);
-    }
+    const pathParts = filename.split('/');
+    const f = pathParts[pathParts.length - 1].split(' ').join('_');
+    fs.writeFileSync(`/Users/jules/workspace/soundboy/python/notebooks/buffers/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
+
+    // try {
+    //     buffer = await trimSamples(buffer);
+    // } catch (e) {
+    //     throw new Error(`Error trimming samples: ${e}`);
+    // }
 
     try {
         buffer = standardize(buffer);
