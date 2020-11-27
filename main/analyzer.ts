@@ -98,19 +98,6 @@ export default class Analyzer {
                     error = (error as any).message;
                 }
 
-                // this worker was already working on something.
-                // this fix is a bit of a band aid for the actual problem
-                // of workers receiving duplicate messages.
-                if (error === 'busy') {
-                    return;
-                }
-
-                // weird bug coming from tensorflow when essentia is also loaded
-                if (error.includes('conv2d/kernel') || error.includes('conv2d/bias')) {
-                    console.log(error);
-                    return;
-                }
-
                 // requeue task
                 let returnError = true;
                 if (result.sound?.filename) {
@@ -144,7 +131,6 @@ export default class Analyzer {
 
         // assign next task
         if (task) {
-            console.log(`assigning task to ${result.workerID} over channel ${TASKS_CHANNEL}`);
             event.sender.send(TASKS_CHANNEL, task);
         } else {
             // kill worker since there's no more work
@@ -169,6 +155,7 @@ export default class Analyzer {
             if (task.status === 'queued') {
                 this.tasks[i].status = 'inprogress';
                 this.tasks[i].attempts += 1;
+                console.log(`Assigning ${task.filename} to ${workerID}`);
                 return { sound: { filename: task.filename }, workerID };
             }
         }
@@ -177,7 +164,6 @@ export default class Analyzer {
     }
 
     private assignTaskTo(id: number) {
-        console.log(`Assigning task to ${id} over channel ${TASKS_CHANNEL}`);
         const worker = this.workers[id];
         worker.webContents.send(TASKS_CHANNEL, this.getTaskFor(id));
     }

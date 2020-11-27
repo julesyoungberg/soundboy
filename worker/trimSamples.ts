@@ -6,7 +6,7 @@ const MIN_DB = -60;
 const FRAME_SIZE = 2048;
 const HOP_SIZE = 1024;
 
-const extractor = new FeatureExtractor({
+const rmsExtractor = new FeatureExtractor({
     features: ['rms'],
     frameSize: FRAME_SIZE,
     hopSize: HOP_SIZE,
@@ -33,7 +33,7 @@ export function trimStart(input: Float32Array) {
 export default async function trimSamples(input: Float32Array) {
     let data: { rms: number[] };
     try {
-        data = await extractor.getFeatureTracks(input);
+        data = await rmsExtractor.getFeatureTracks(input);
     } catch (e) {
         throw new Error(`Error getting sample RMS: ${e}`);
     }

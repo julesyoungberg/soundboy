@@ -129,11 +129,10 @@ export default class FeatureExtractor {
     }
 
     async setup() {
-        console.log('FEATURE EXTRACTOR SETUP');
         if (this.useEssentia) {
             this.essentia = await getEssentia();
+            await this.classifier?.setup();
         }
-        await this.classifier?.setup();
     }
 
     window(signal: any) {
@@ -174,6 +173,8 @@ export default class FeatureExtractor {
      * @param buffer
      */
     async getFeatureTracks(buffer: Float32Array): Promise<FeatureTracks> {
+        console.log(`Getting Feature Tracks (using Essentia: ${this.useEssentia}`);
+        
         if (!this.ready()) {
             await this.setup();
         }
@@ -186,7 +187,6 @@ export default class FeatureExtractor {
         let prevFrame = new Float32Array(this.frameSize).fill(0);
         const meydaFeaturs = Object.keys(this.meydaFeatures);
 
-        console.log('getting frames');
         let n = 0;
         let getFrame: ((i: number) => any) | undefined;
         if (this.useEssentia) {
@@ -207,7 +207,6 @@ export default class FeatureExtractor {
         // step through signal
         for (let i = 0; i < n; i++) {
             const frame: any = getFrame(i);
-            console.log('processing frame', frame);
 
             // meyda features
             if (meydaFeaturs.length > 0) {
