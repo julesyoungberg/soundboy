@@ -2,19 +2,32 @@
 
 A sample classification tool for music producers. Intended to make it easier for you to find the sounds you want.
 
-## Setup
+## App Setup
 
 Make sure node and npm are up to date, then it's simple as
 
 ```shell
-git clone git@github.com:julesyoungberg/soundboy.git
+git clone --recursive git@github.com:julesyoungberg/soundboy.git
 cd soundboy
 npm i
 npm run build:worker
 npm run dev
 ```
 
-### Getting a Keras Model Ready For JS
+## Python Setup
+
+To get going with the python notebooks for this project, first make sure you have Docker set up, then run
+
+```shell
+pushd python/MIR-toolbox-docker
+make build
+popd
+npm run notebooks
+```
+
+Visit `http://localhost:8889` and sign in with password `mir`.
+
+### Preparing a Keras Model for Deployment in JS
 
 https://www.tensorflow.org/js/tutorials/conversion/import_keras
 

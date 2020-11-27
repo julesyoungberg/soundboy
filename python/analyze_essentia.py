@@ -1,14 +1,11 @@
-import os, shutil
-import librosa
+import os
+import shutil
 import essentia.standard
 import numpy as np
-import librosa
-import librosa.display
 import essentia
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import sklearn
-
 
 
 def get_features(d):
@@ -20,32 +17,32 @@ def get_features(d):
 
         #loader = essentia.standard.EasyLoader(filename=d, sampleRate = sr, endTime = 5)
         #loader = essentia.standard.EqloudLoader(filename=d, sampleRate = sr, endTime = duration)
-        loader = essentia.standard.MonoLoader(filename=d, sampleRate = sr)
+        loader = essentia.standard.MonoLoader(filename=d, sampleRate=sr)
         audio = loader()
 
         if (len(audio) > duration * sr):
             audio = audio[:duration * sr]
-        
 
         n_coef = 13
         n_bands = 40
         frame_size = 2048
         hop = 1024
-        
-        w = essentia.standard.Windowing(type = 'hann')
+
+        w = essentia.standard.Windowing(type='hann')
         spectrum = essentia.standard.Spectrum()
-        mfcc = essentia.standard.MFCC(numberCoefficients=n_coef, sampleRate=sr, numberBands = n_bands)
+        mfcc = essentia.standard.MFCC(
+            numberCoefficients=n_coef, sampleRate=sr, numberBands=n_bands)
 
         mfccs = []
 
-        for frame in essentia.standard.FrameGenerator(audio, frameSize = frame_size, hopSize = hop):
-                mfcc_bands, mfcc_coeffs = mfcc(spectrum(w(frame)))
-                mfccs.append(mfcc_coeffs)
-        
+        for frame in essentia.standard.FrameGenerator(audio, frameSize=frame_size, hopSize=hop):
+            mfcc_bands, mfcc_coeffs = mfcc(spectrum(w(frame)))
+            mfccs.append(mfcc_coeffs)
 
         mfccs = essentia.array(mfccs).T
         pad_width = 95 - mfccs.shape[1]
-        mfccs = np.pad(mfccs, pad_width=((0,0), (0, pad_width)), mode='reflect')
+        mfccs = np.pad(mfccs, pad_width=(
+            (0, 0), (0, pad_width)), mode='reflect')
 
         # centroid = librosa.feature.spectral_centroid(y=audio, sr = sr, n_fft = nfft, hop_length = hop)
         # bandwidth = librosa.feature.spectral_centroid(y= audio, sr = sr, n_fft = nfft, hop_length = hop)
@@ -53,7 +50,6 @@ def get_features(d):
         # spectral_flatness = librosa.feature.spectral_flatness(y = audio, n_fft = nfft, hop_length = hop)
         # spectral_rolloff = librosa.feature.spectral_rolloff(y = audio, sr = sr, n_fft = nfft, hop_length = hop)
         # zcr = librosa.feature.zero_crossing_rate(y = audio, hop_length = 1024)
-
 
         # feature_vector = [
         #     centroid.mean(),
@@ -81,14 +77,14 @@ def get_features(d):
         #     mfccs.mean(),
         #     mfccs.std()
         # ]
-        
+
         # feature_vector = np.array(feature_vector)
         #normalized_feature_vector = (feature_vector - feature_vector.mean(0)) / feature_vector.std(0)
         return mfccs
 
     except Exception as e:
         print("error processing file ", dir, e)
-        #os.remove(dir)
+        # os.remove(dir)
         print(f"Deleted file{dir}")
         return [-1]
 
@@ -120,12 +116,11 @@ for root, dirs, files in os.walk(folder, topdown=False):
         #         mfcc = sklearn.preprocessing.scale(mfcc.astype(float), axis=0)
         #         mfccs.append(mfcc)
         #         labels.append(label)
-            
 
         # Real Code
         mfcc = get_features(cur_dir)
         if len(mfcc) > 1:
-            #features.append(feature_vector)
+            # features.append(feature_vector)
             # Standardizing mfcc data so coefficient dimension has zero mean and unit variance
             mfccs.append(mfcc)
             labels.append(label)

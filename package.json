@@ -9,6 +9,7 @@
     "dev": "nextron",
     "build": "nextron build",
     "build:worker": "webpack --config worker/webpack.config.js",
+    "notebooks": "docker run --rm -p 8889:8888 --mount type=bind,source=$(pwd)/python,target=/notebooks mtgupf/mir-toolbox",
     "postinstall": "electron-builder install-app-deps",
     "prettier": "prettier --list-different --write './**/*.{j,t}s?(x)'",
     "prettier:check": "prettier --check './**/*.{j,t}s?(x)'",

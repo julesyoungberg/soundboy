@@ -1,15 +1,12 @@
 import * as tf from '@tensorflow/tfjs';
 
+import { HOP_SIZE } from './config';
 import FeatureExtractor from './FeatureExtractor';
 
 const MIN_DB = -60;
-const FRAME_SIZE = 2048;
-const HOP_SIZE = 1024;
 
 const rmsExtractor = new FeatureExtractor({
     features: ['rms'],
-    frameSize: FRAME_SIZE,
-    hopSize: HOP_SIZE,
     useEssentia: false,
 });
 
