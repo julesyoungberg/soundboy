@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
-model = tf.keras.models.load_model('saved_models/soundboy_model_new.h5')
+model = tf.keras.models.load_model('saved_models/soundboy_model_zeros.h5')
 
 model.summary()
 
@@ -16,14 +16,15 @@ model.summary()
 labels = np.load('labels.npy')
 labels = np.unique(labels)
 
-print(labels)
+#print(labels)
 these_labels = []
 pred_labels = []
 
-mfccs = np.load('x_test_new.npy')
-these_labels = np.load('y_test_new.npy')
+mfccs = np.load('zero_mfccs_val.npy')
+these_labels = np.load('zero_labels_val.npy')
 real_labels = []
-print(mfccs[0].shape)
+
+mfccs = np.array([mfcc[1:] for mfcc in mfccs])
 
 from tqdm import tqdm 
 
@@ -41,13 +42,12 @@ ax = fig.add_subplot()
 cm = confusion_matrix(y_true = these_labels, y_pred = pred_labels)
 cax = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
 fig.colorbar(cax)
-plt.tight_layout()
 ax.set_xticks(np.arange(10))
 ax.set_yticks(np.arange(10))
 ax.set_xticklabels(labels.tolist(), rotation=45)
 ax.set_yticklabels(labels.tolist())
-plt.ylabel('True label')
-plt.xlabel('Predicted label')
+ax.set_ylabel('True label')
+ax.set_xlabel('Predicted label')
 
 plt.show()
 
