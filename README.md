@@ -7,9 +7,7 @@ A sample classification tool for music producers. Intended to make it easier for
 Make sure node and npm are up to date, then it's simple as
 
 ```shell
-git clone --recursive git@github.com:julesyoungberg/soundboy.git
-cd soundboy
-npm i
+npm ci
 npm run build:worker
 npm run dev
 ```
