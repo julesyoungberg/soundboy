@@ -3,7 +3,6 @@ import { Sound } from '../@types';
 import { MAX_CLIP_LENGTH, SAMPLE_RATE } from './config';
 import FeatureExtractor from './FeatureExtractor';
 import loadSoundFile from './loadSoundFile';
-import trimSamples from './trimSamples';
 
 const extractor = new FeatureExtractor({ useEssentia: true });
 

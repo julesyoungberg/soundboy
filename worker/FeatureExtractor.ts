@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs';
-import fs from 'fs';
+// import fs from 'fs';
 // eslint-disable-next-line
 import Essentia from 'essentia.js/dist/core_api';
 import meyda from 'meyda/dist/node/main';
@@ -175,7 +175,7 @@ export default class FeatureExtractor {
      */
     async getFeatureTracks(buffer: Float32Array, filename?: string): Promise<FeatureTracks> {
         console.log(`Getting Feature Tracks (using Essentia: ${this.useEssentia}`);
-        
+
         if (!this.ready()) {
             await this.setup();
         }
@@ -356,11 +356,6 @@ export default class FeatureExtractor {
      * @param buffer
      */
     async getFeatures(buffer: Float32Array, filename: string): Promise<Sound> {
-        // Save buffer to file for comparisons with python results
-        // const pathParts = filename.split('/');
-        // const f = pathParts[pathParts.length - 1].split(' ').join('_');
-        // fs.writeFileSync(`/Users/jules/workspace/soundboy/python/notebooks/buffers/${f}-samples.json`, JSON.stringify(Array.from(buffer), null, 2));
-
         console.log('computing features');
         let featureTracks: FeatureTracks = initialFeatureTracks();
         try {

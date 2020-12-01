@@ -1,4 +1,3 @@
-import debounce from 'lodash.debounce';
 import { IpcRendererEvent } from 'electron';
 
 import { AnalyzerMessage } from '../@types';
@@ -12,7 +11,7 @@ const { ipcRenderer } = electron;
 /**
  * Main worker logic
  * given a filename, load it, analyze it, return the results
-*/
+ */
 async function handler(event: IpcRendererEvent, data: AnalyzerMessage) {
     console.log(`Received task - worker ID: ${data.workerID}`);
 
