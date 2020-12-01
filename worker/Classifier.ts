@@ -33,12 +33,12 @@ export default class Classifier {
         // make sure the mfcc vector is the right length
         const { n } = this;
         let mfccs = raw.map((coefs) => coefs.slice(1));
-    
+
         // Save the raw mfccs to a file for comparisons in python
         // const pathParts = filename.split('/');
         // const f = pathParts[pathParts.length - 1].split(' ').join('_');
         // fs.writeFileSync(`/Users/jules/workspace/soundboy/python/notebooks/mfccs/${f}-mfccs.json`, JSON.stringify(mfccs, null, 2));
-    
+
         try {
             if (mfccs.length < n) {
                 const d = n - mfccs.length;

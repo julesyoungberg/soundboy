@@ -5,6 +5,7 @@ const mTheme = {
     breakpoints: ['40em', '52em', '64em'],
     colors: {
         ...theme.colors,
+        red: '#fa667a',
         black: '#242322',
         grey: '#c9c9c9',
         medGrey: '#575c62',

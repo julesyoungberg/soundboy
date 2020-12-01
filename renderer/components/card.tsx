@@ -11,6 +11,8 @@ const Card = ({
     onClick,
     href,
     className,
+    padding = 3,
+    maxHeight = 'none',
 }: {
     title?: string;
     active?: boolean;
@@ -18,6 +20,8 @@ const Card = ({
     onClick?: () => void;
     children?: React.ReactNode;
     className?: string;
+    padding?: number;
+    maxHeight?: number | string;
 }) => {
     const theme = useTheme();
     let activeStyle = {};
@@ -29,6 +33,7 @@ const Card = ({
         };
     }
     const style = {
+        maxHeight,
         borderRadius: '7px',
         borderWidth: '1px',
         borderColor: 'grey',
@@ -40,7 +45,7 @@ const Card = ({
     };
     return (
         <Clickable href={href} onClick={onClick} className={className}>
-            <Box p={3} mx={2} my={2} sx={active ? { ...style, ...activeStyle } : style} bg='white'>
+            <Box p={padding} mx={2} my={2} sx={active ? { ...style, ...activeStyle } : style} bg='white'>
                 {!!title && (
                     <Heading my={2} color='primary' fontWeight='bold' fontSize={[4, 3]}>
                         {title}

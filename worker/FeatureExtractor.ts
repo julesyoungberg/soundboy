@@ -175,7 +175,7 @@ export default class FeatureExtractor {
      */
     async getFeatureTracks(buffer: Float32Array, filename?: string): Promise<FeatureTracks> {
         console.log(`Getting Feature Tracks (using Essentia: ${this.useEssentia}`);
-        
+
         if (!this.ready()) {
             await this.setup();
         }

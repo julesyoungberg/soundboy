@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer, useState } from 'react';
 import { RiSoundModuleFill } from 'react-icons/ri';
+import { FaMapMarkedAlt as FaMap } from 'react-icons/fa';
 import { Text, Box, Flex } from 'rebass';
 import { Input, Label, Select } from '@rebass/forms';
 
@@ -12,6 +13,7 @@ import FilterPair from './filter-pair';
 import Stack from './stack';
 import List from './list';
 import Card from './card';
+import Graph from './graph';
 
 const LABELS = {
     instrument: 'Instrument',
@@ -81,6 +83,28 @@ const filterToQuery = (filterState: SoundsFilter) =>
             ...queries[filter](v),
         };
     }, {});
+
+const Heading = ({
+    text,
+    icon,
+    marginTop = 2,
+    paddingTop = 2,
+}: {
+    text: string;
+    icon: React.ReactNode;
+    marginTop?: number;
+    paddingTop?: number;
+}) => {
+    return (
+        <Flex justifyContent='space-between' marginTop={marginTop} marginBottom={2} px={3} py={paddingTop * 2}>
+            <Text color='black' fontWeight='bold' fontSize={[3, 4]} paddingTop={paddingTop}>
+                <Flex alignItems='center' sx={{ '> svg': { marginLeft: '11px' } }}>
+                    {text} {icon}
+                </Flex>
+            </Text>
+        </Flex>
+    );
+};
 
 const Samples = () => {
     const [filterState, filterDispatch] = useReducer(filterReducer, initialFilter);
@@ -153,13 +177,7 @@ const Samples = () => {
     return (
         <Flex sx={{ width: '100%' }}>
             <Stack marginLeft={2}>
-                <Flex justifyContent='space-between' marginTop={2} marginBottom={2} px={3} py={4}>
-                    <Text color='black' fontWeight='bold' fontSize={[3, 4]} paddingTop={2}>
-                        <Flex alignItems='center' sx={{ '> svg': { marginLeft: '11px' } }}>
-                            Filters <RiSoundModuleFill size='27px' />
-                        </Flex>
-                    </Text>
-                </Flex>
+                <Heading text='Filters' icon={<RiSoundModuleFill size='27px' />} />
                 <Card>
                     <Flex>
                         <Box style={{ padding: 10, width: '100%' }}>
@@ -209,6 +227,8 @@ const Samples = () => {
                         />
                     ))}
                 </Card>
+                <Heading paddingTop={1} marginTop={0} text='Mini-map' icon={<FaMap />} />
+                <Graph setPage={setPage} />
             </Stack>
             <List title='Samples' sounds={sounds} page={page} onPageChange={setPage} />
         </Flex>

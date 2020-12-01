@@ -23,6 +23,7 @@ export interface Sound {
     perceptualSharpness?: Feature;
     perceptualSpread?: Feature;
     pitch?: string;
+    rms?: Feature;
     spectralCentroid?: Feature;
     spectralFlatness?: Feature;
     spectralFlux?: Feature;
