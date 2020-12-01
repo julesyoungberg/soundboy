@@ -8,6 +8,8 @@ import PauseButton from './pause-button';
 import useTheme from '../../hooks/useTheme';
 import AudioSlider from './audio-slider';
 import getFileName from '../../../util/getFileName';
+import { Slider } from '@rebass/forms';
+import VolumeSlider from './volume-slider';
 
 const MainAudioPlayer = () => {
     const theme = useTheme();
@@ -34,16 +36,21 @@ const MainAudioPlayer = () => {
     const filename = getFileName(nowPlaying.sound.filename);
     return (
         <Box sx={{ flex: '1', minWidth: '200px', marginTop: 3 }}>
+            
             <Card>
-                <Text mx={1} my={2} color='black' fontWeight='bold' fontSize={[1, 2]}>
+                <Flex justifyContent="space-between">
+                    <Text mx={1} my={2} color='black' fontWeight='bold' fontSize={[1, 2]}>
                     {filename}
-                </Text>
+                    </Text>
+                    <VolumeSlider audio={nowPlaying.audio}></VolumeSlider>
+                </Flex>
                 <Flex alignItems='center'>
                     <PauseButton width={50} height={50} color={theme.colors.black} playing={playing} onClick={pause} />
                     {!!nowPlaying?.audio && <AudioSlider audio={nowPlaying.audio} />}
                 </Flex>
             </Card>
         </Box>
+
     );
 };
 
