@@ -8,8 +8,7 @@ import IconButton from './icon-button';
 import { GrFormPrevious, GrFormNext } from 'react-icons/gr';
 import AnalyzerStatus from './analyzer-status';
 import { GiSoundOn } from 'react-icons/gi';
-
-const SOUNDS_PER_PAGE = 6;
+import { SOUNDS_PER_PAGE } from '../../constants';
 
 const List = ({
     title,
