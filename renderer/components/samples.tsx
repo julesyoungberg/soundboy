@@ -175,7 +175,7 @@ const Samples = () => {
         await getSounds(query);
     };
     return (
-        <Flex sx={{ width: '100%' }}>
+        <Flex sx={{ width: '100%', paddingRight: 10 }}>
             <Stack marginLeft={2}>
                 <Heading text='Filters' icon={<RiSoundModuleFill size='27px' />} />
                 <Card>
