@@ -14,7 +14,7 @@ const Sample = ({ sound }: { sound: Sound }) => {
     const { filename: path } = sound;
     const filename = getFileName(path);
     const onDrag = (e) => {
-        event.preventDefault();
+        e.preventDefault();
         ipcService.send('ondragstart', path);
     };
     return (
