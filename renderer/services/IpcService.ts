@@ -24,7 +24,7 @@ export default class IpcService {
      * @param channel
      * @param request
      */
-    send(channel: string, request: IpcRequest = {}) {
+    send(channel: string, request: IpcRequest | string = {}) {
         console.log('sending to', channel);
         // If the ipcRenderer is not available try to initialize it
         if (!this.ipcRenderer) {

@@ -1,8 +1,9 @@
-import { app, protocol } from 'electron';
+import { app, protocol, ipcMain } from 'electron';
 import serve from 'electron-serve';
 
 import createWindow from './create-window';
 import { registerIpcChannels } from './ipc';
+import path from 'path';
 
 app.allowRendererProcessReuse = true;
 
@@ -51,5 +52,12 @@ app.on('ready', async () => {
         } catch (error) {
             console.error(error);
         }
+    });
+});
+
+ipcMain.on('ondragstart', (event, filePath) => {
+    event.sender.startDrag({
+        file: filePath,
+        icon: path.resolve(__dirname, '../icon.png'),
     });
 });

@@ -1,16 +1,22 @@
-import React from 'react';
-import { Text, Box } from 'rebass';
+import React, { useRef, useEffect } from 'react';
+import { Text, Box, Flex } from 'rebass';
 
 import { Sound } from '../../@types';
 import { AudioPlayer } from './audio-player';
 import useTheme from '../hooks/useTheme';
+import useIpcService from '../hooks/useIpcService';
 import Stack from './stack';
 import getFileName from '../../util/getFileName';
 
 const Sample = ({ sound }: { sound: Sound }) => {
     const theme = useTheme();
+    const ipcService = useIpcService();
     const { filename: path } = sound;
     const filename = getFileName(path);
+    const onDrag = (e) => {
+        e.preventDefault();
+        ipcService.send('ondragstart', path);
+    };
     return (
         <Stack>
             {!!filename && (
@@ -28,11 +34,12 @@ const Sample = ({ sound }: { sound: Sound }) => {
                     {filename}
                 </Text>
             )}
-            <Box
+            <Flex
                 paddingRight={2}
                 marginLeft={2}
                 my={1}
                 bg='white'
+                alignItems='center'
                 sx={{
                     borderTopLeftRadius: '7px',
                     borderBottomLeftRadius: '7px',
@@ -42,8 +49,25 @@ const Sample = ({ sound }: { sound: Sound }) => {
                     boxShadow: theme.shadows.normal,
                 }}
             >
+                <Flex
+                    draggable='true'
+                    onDragStart={onDrag}
+                    alignItems='center'
+                    fontSize={3}
+                    sx={{
+                        paddingLeft: '3.5px',
+                        color: 'grey',
+                        cursor: 'grab',
+                        height: '60px',
+                        width: '15px',
+                        borderRight: '1px solid #000',
+                        borderColor: 'grey',
+                    }}
+                >
+                    <Box bg='grey' sx={{ marginLeft: '3px', height: '20px', width: '1px' }} />
+                </Flex>
                 <AudioPlayer sound={sound} />
-            </Box>
+            </Flex>
         </Stack>
     );
 };
