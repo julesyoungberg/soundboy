@@ -6,22 +6,20 @@ import { ImVolumeHigh, ImVolumeMedium, ImVolumeLow, ImVolumeMute2  } from "react
 
 const VolumeSlider = ({audio}) => {
     const input = useRef<HTMLInputElement>();
-    const Icon = iconDet => {
+    const [volume, setVolume] = useState<number>(1);
+
+    const Icon = () => {
         if (volume > .67) {
             return <ImVolumeHigh size = "25px"/>;
         }
-        else if (volume > .33) {
+        if (volume > .33) {
             return <ImVolumeMedium size = "25px"/>;
         }
-        else if (volume > 0) {
+        if (volume > 0) {
             return <ImVolumeLow size = "25px" />;
         }
-        else {
-            return <ImVolumeMute2 size = "25px" />;
-        }
+        return <ImVolumeMute2 size = "25px" />;
     }
-
-    const [volume, setVolume] = useState<number>(1)
 
     const getValue = () => Number(input?.current?.value || 1);
 
