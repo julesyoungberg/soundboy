@@ -74,10 +74,11 @@ const Graph = ({ setPage }: { setPage: (number) => void }) => {
     const yMin = Math.min(...yAxis) - padding;
     if (data.length <= 0) return null;
     return (
-        <Card padding={1} maxHeight='280px'>
+        <Card padding={0} maxHeight='180px'>
             <VictoryChart
-                height={168}
                 domain={{ y: [yMin, yMax] }}
+                height={180}
+                padding={{ top: 0, bottom: 0, right: 0, left: 0 }}
                 containerComponent={<VictoryZoomContainer zoomDomain={{ x: [xMin, xMax], y: [yMin, yMax] }} />}
             >
                 <VictoryScatter
@@ -100,7 +101,7 @@ const Graph = ({ setPage }: { setPage: (number) => void }) => {
                                         target: 'data',
                                         mutation: (props) => {
                                             const id = props?.datum.id;
-                                            setPage(Math.ceil(id / SOUNDS_PER_PAGE));
+                                            setPage(Math.ceil((id + 1) / SOUNDS_PER_PAGE));
                                             return null;
                                         },
                                     },
