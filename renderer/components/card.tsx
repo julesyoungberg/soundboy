@@ -34,6 +34,7 @@ const Card = ({
     }
     const style = {
         maxHeight,
+        overflow: 'hidden',
         borderRadius: '7px',
         borderWidth: '1px',
         borderColor: 'grey',
