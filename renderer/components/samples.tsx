@@ -27,7 +27,8 @@ const SELECT = {
 
 const PAIRS = {
     brightness: ['Bright', 'Dark'],
-    fullness: ['Full', 'Holllow'],
+    // TODO debug / fix these
+    // fullness: ['Full', 'Holllow'],
     // loudness: ['Loud', 'Quiet'],
     // noisiness: ['Noisy', 'Soft'],
     // pitchiness: ['Tonal', 'Atonal'],
