@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import React from 'react';
 import { Button, Flex } from 'rebass';
 
@@ -11,6 +12,12 @@ interface FilterPairProps {
     option2Count?: number;
     disabled?: boolean;
 }
+
+const StyledButton = styled(Button)<{ disabled: boolean }>`
+    width: 50%;
+    cursor: pointer;
+    color: ${({ disabled }) => disabled ? 'grey' : undefined};
+`;
 
 export default function FilterPair({
     className,
@@ -34,35 +41,31 @@ export default function FilterPair({
 
     return (
         <Flex className={className} style={{ padding: '10px 0 10px 10px', width: '100%' }}>
-            <Button
+            <StyledButton
                 mr={2}
                 onClick={createChangeHandler(option1)}
                 variant={current === option1 ? 'primary' : 'outline'}
                 disabled={disabled || option1Count <= 0}
                 style={{
-                    cursor: 'pointer',
                     marginRight: 0,
                     borderTopRightRadius: 0,
                     borderBottomRightRadius: 0,
-                    width: '50%',
                 }}
             >
                 {option1} {typeof option1Count !== 'undefined' && `(${option1Count})`}
-            </Button>
-            <Button
+            </StyledButton>
+            <StyledButton
                 mr={2}
                 onClick={createChangeHandler(option2)}
                 variant={current === option2 ? 'primary' : 'outline'}
                 disabled={disabled || option2Count <= 0}
                 style={{
-                    cursor: 'pointer',
                     borderTopLeftRadius: 0,
                     borderBottomLeftRadius: 0,
-                    width: '50%',
                 }}
             >
                 {option2} {typeof option2Count !== 'undefined' && `(${option2Count})`}
-            </Button>
+            </StyledButton>
         </Flex>
     );
 }
