@@ -36,11 +36,10 @@ const MainAudioPlayer = () => {
     const filename = getFileName(nowPlaying.sound.filename);
     return (
         <Box sx={{ flex: '1', minWidth: '200px', marginTop: 3 }}>
-            
             <Card>
-                <Flex justifyContent="space-between">
+                <Flex justifyContent='space-between'>
                     <Text mx={1} my={2} color='black' fontWeight='bold' fontSize={[1, 2]}>
-                    {filename}
+                        {filename}
                     </Text>
                     <VolumeSlider audio={nowPlaying.audio}></VolumeSlider>
                 </Flex>
@@ -50,7 +49,6 @@ const MainAudioPlayer = () => {
                 </Flex>
             </Card>
         </Box>
-
     );
 };
 

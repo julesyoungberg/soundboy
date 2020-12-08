@@ -16,7 +16,7 @@ interface FilterPairProps {
 const StyledButton = styled(Button)<{ disabled: boolean }>`
     width: 50%;
     cursor: pointer;
-    color: ${({ disabled }) => disabled ? 'grey' : undefined};
+    color: ${({ disabled }) => (disabled ? 'grey' : undefined)};
 `;
 
 export default function FilterPair({

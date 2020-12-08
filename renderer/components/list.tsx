@@ -57,6 +57,7 @@ const List = ({
                 {sounds.slice((page - 1) * SOUNDS_PER_PAGE, page * SOUNDS_PER_PAGE).map((sound) => (
                     <Sample sound={sound} key={sound._id} />
                 ))}
+                {sounds.length === 0 && <p style={{ textAlign: 'center' }}>No sounds</p>}
             </Stack>
         </Box>
     );
