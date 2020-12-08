@@ -55,7 +55,7 @@ export function downsampleBuffer(sourceBuffer: AudioBuffer, targetRate: number):
 export default async function loadSoundFile(filename: string, sampleRate?: number): Promise<Float32Array> {
     let buffer: AudioBuffer | undefined;
     try {
-        buffer = await load(encodeURI(filename));
+        buffer = await load(`audio://${filename}`);
     } catch (e) {
         throw new Error(`Error loading '${filename}': ${e}`);
     }
