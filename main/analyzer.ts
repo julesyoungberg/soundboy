@@ -11,14 +11,13 @@ const NUM_WORKERS = Math.ceil(os.cpus().length);
 
 function createWorkerWindow() {
     const window = new BrowserWindow({
-        // show: false,
+        show: false,
         webPreferences: {
             nodeIntegration: true,
         },
     });
 
     window.loadURL(`file://${path.resolve(__dirname, '../worker/dist/index.html')}`);
-    window.webContents.openDevTools();
     return window;
 }
 

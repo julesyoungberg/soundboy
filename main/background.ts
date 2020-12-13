@@ -27,6 +27,7 @@ if (isProd) {
 
     if (isProd) {
         await mainWindow.loadURL('app://./home.html');
+        mainWindow.setMenuBarVisibility(false);
     } else {
         const port = process.argv[2];
         await mainWindow.loadURL(`http://localhost:${port}/home`);
@@ -39,7 +40,7 @@ app.on('window-all-closed', () => {
 });
 
 protocol.registerSchemesAsPrivileged([
-    { scheme: 'audio', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: false } },
+    { scheme: 'audio', privileges: { standard: false, secure: true, supportFetchAPI: true, corsEnabled: false } },
 ]);
 
 app.on('ready', async () => {
